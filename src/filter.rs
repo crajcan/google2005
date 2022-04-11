@@ -9,9 +9,10 @@ pub fn filtered_links<'a>(
 
 fn is_junk(link: &str, description: &Vec<&str>) -> bool {
     is_alternative_search(link)
-        || is_image_link(link)
-        || is_google_logistics(description)
         || is_google_logo(description)
+        || is_image_link(link)
+        || is_google_ad(link)
+        || is_google_logistics(description)
 }
 
 fn is_alternative_search(link: &str) -> bool {
@@ -33,4 +34,9 @@ fn is_google_logistics(description: &Vec<&str>) -> bool {
 
 fn is_google_logo(description: &Vec<&str>) -> bool {
     *description == vec!["G", "o", "o", "g", "l", "e"]
+}
+
+fn is_google_ad(link: &str) -> bool {
+    link.starts_with("http://www.google.com/aclk?")
+        || link.starts_with("https://www.google.com/aclk?")
 }
