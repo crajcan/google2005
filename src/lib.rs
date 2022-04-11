@@ -2,6 +2,8 @@ use reqwest::Client;
 
 mod parser;
 use parser::parse;
+mod filter;
+use filter::filtered_links;
 use scraper::Html;
 use std::fmt::Debug;
 
@@ -14,9 +16,9 @@ pub async fn google(query: &str) -> Result<String, MyError> {
     match search_for_web_results(query).await {
         Ok(results) => {
             let dom = Html::parse_document(&results);
-            let links = parse(&dom);
-            let filtered_links = filtered_links(links);
-            build(links)
+            let mut links = parse(&dom);
+            let filtered_links = filtered_links(&mut links);
+            build(filtered_links)
         }
         Err(e) => {
             println!("error: {}", e);
