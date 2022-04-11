@@ -20,23 +20,27 @@ async fn main() {
     }
 }
 
+fn query(buffer: &[u8]) -> String {
+    let after_equals = &buffer[14..];
+    let until_space = after_equals.split(|c| *c == b' ').next().unwrap();
+    let string_query = String::from_utf8_lossy(until_space);
+    println!("***** string query: {}******", string_query);
+
+    string_query.to_string()
+}
+
 async fn handle_connection(mut stream: TcpStream) {
     println!("handling connection");
     let mut buffer = [0; 512];
     stream.read(&mut buffer).await.unwrap();
 
-    let search = b"GET /search";
+    let search = b"GET /search?q=";
 
     let (status_line, contents) = if buffer.starts_with(search) {
-        let query = &buffer[9..];
-        let string_query = String::from_utf8_lossy(query);
-
-        println!("query: {}", string_query);
-
-        let contents = search_for_web_results(&string_query).await;
-        ("HTTP/1.1 200 OK\r\n\r\n", contents.unwrap())
+        let contents = google2005::google(&query(&buffer)).await;
+        ("HTTP/1.1 200 OK", contents.unwrap())
     } else {
-        ("HTTP/1.1 404 NOT FOUND\r\n\r\n", "Not Found".to_string())
+        ("HTTP/1.1 404 NOT FOUND", "Not Found".to_string())
     };
 
     let response = format!(
@@ -46,7 +50,7 @@ async fn handle_connection(mut stream: TcpStream) {
         contents
     );
 
-    println!("Response: {}", response);
+    // println!("Response: {}", response);
 
     stream.write(response.as_bytes()).await.unwrap();
     stream.flush().await.unwrap();
