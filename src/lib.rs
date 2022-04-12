@@ -3,7 +3,7 @@ use reqwest::Client;
 mod parser;
 use parser::parse;
 mod filter;
-use filter::filtered_links;
+use filter::{filtered_links, SearchResult};
 use scraper::Html;
 use std::fmt::Debug;
 use urlencoding::decode;
@@ -39,19 +39,19 @@ pub async fn search_for_web_results(query: &str) -> Result<String, reqwest::Erro
     Ok(body)
 }
 
-fn build(parsed: &Vec<(&str, Vec<&str>)>) -> Result<String, MyError> {
+fn build(parsed: &Vec<SearchResult>) -> Result<String, MyError> {
     let mut results = "".to_string();
     results.push_str("<!DOCTYPE html>");
     results.push_str(r#"<html lang="en">"#);
 
-    for (i, line) in parsed.iter().enumerate() {
-        let url = decode(line.0).unwrap();
+    for (i, search_result) in parsed.iter().enumerate() {
+        let url = decode(search_result.url()).unwrap();
 
         results.push_str(&format!(
             r#"<p><em>{}. </em><a href={}>{}</a></br>"#,
             i + 1,
             url,
-            line.1.join(" ")
+            search_result.title().join(" ")
         ));
         results.push_str(&format!(r#"<span>{}</span></p>"#, url));
     }

@@ -1,11 +1,10 @@
-use scraper::html::{self, Select};
-use scraper::node::Element;
+use crate::filter::SearchResult;
 use scraper::{ElementRef, Html, Selector};
 
-pub fn parse(dom: &Html) -> Vec<(&str, Vec<&str>)> {
+pub fn parse(dom: &Html) -> Vec<SearchResult> {
     links(dom)
         .iter()
-        .map(|h1| (get_href(*h1), get_text(*h1)))
+        .map(|h1| SearchResult::new(get_href(*h1), get_text(*h1)))
         .collect::<Vec<_>>()
 }
 
