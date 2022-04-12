@@ -1,10 +1,18 @@
+use reqwest::Url;
+
 //use filter to filter out links that contain "search?q=""
 pub fn filtered_links<'a>(
     links: &'a mut Vec<(&'a str, Vec<&'a str>)>,
 ) -> &'a mut Vec<(&'a str, Vec<&'a str>)> {
     remove_junk(links);
     strip_analytics_bs(links);
-    // remove_redundant_pages(links);
+    remove_redundant_pages(links);
+
+    if links.len() != 10 {
+        println!("Error: Should return 10 links, {} links found", links.len());
+
+        println!("{:#?}", links);
+    }
 
     links
 }
@@ -67,14 +75,28 @@ fn bookended_with(start: &str, end: &str, s: &str) -> String {
     between.to_string()
 }
 
-// fn remove_redundant_pages(links: &mut Vec<(&str, Vec<&str>)>) {
-//     let mut unique_pages = vec![];
+fn remove_redundant_pages(links: &mut Vec<(&str, Vec<&str>)>) {
+    let mut unique_pages = vec![];
 
-//     for (i, (link, description)) in links.iter().enumerate() {
-//         if unique_pages.includes(link.split(
-//     }
+    links.retain(|(link, _)| {
+        if unique_pages.contains(&web_page(link)) {
+            false
+        } else {
+            unique_pages.push(web_page(link));
+            true
+        }
+    });
+}
 
-// }
+fn web_page(link: &str) -> &str {
+    let segments = link.split(&['%', '?', '&', '#'][..]).collect::<Vec<&str>>();
+
+    if segments.len() > 1 {
+        segments[0]
+    } else {
+        link
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -98,12 +120,71 @@ mod tests {
         assert_eq!(bookended_with("<a>", "</a>", input), "<a>bar</a>")
     }
 
-    // #[test]
-    // fn test_web_page_returns_segment_before_percent() {
-    //     let input =
-    // }
+    #[test]
+    fn test_web_page_returns_segment_before_question_mark() {
+        let input = "https://www.lowes.com/pl/Cordless--Drills/4294607722?refinement=4294776932";
 
-    // #[test]
-    // fn test_web_page_returns_segment_before_ampersand() {
-    // }
+        assert_eq!(
+            web_page(input),
+            "https://www.lowes.com/pl/Cordless--Drills/4294607722",
+        )
+    }
+
+    #[test]
+    fn test_web_page_returns_segment_before_pound_sign() {
+        let input = "https://en.wikipedia.org/wiki/David_Blough#2015_season";
+
+        assert_eq!(
+            web_page(input),
+            "https://en.wikipedia.org/wiki/David_Blough",
+        )
+    }
+
+    #[test]
+    fn test_web_page_returns_segment_before_percent_sign() {
+        let input = "https://en.wikipedia.org/wiki/David_Blough%232015_season";
+
+        assert_eq!(
+            web_page(input),
+            "https://en.wikipedia.org/wiki/David_Blough",
+        )
+    }
+
+    #[test]
+    fn test_redundant_pages() {
+        let mut links = vec![
+            (
+                "https://en.wikipedia.org/wiki/David_Blough#2015_season",
+                vec![],
+            ),
+            (
+                "https://en.wikipedia.org/wiki/David_Blough#College_Career",
+                vec![],
+            ),
+            (
+                "https://www.lowes.com/pl/Cordless--Drills/4294607722?refinement=4294776932",
+                vec![],
+            ),
+            (
+                "https://www.lowes.com/pl/Cordless--Drills/4294607722?refinement=2347815098",
+                vec![],
+            ),
+        ];
+
+        remove_redundant_pages(&mut links);
+
+        assert_eq!(
+            links,
+            vec![
+                (
+                    "https://en.wikipedia.org/wiki/David_Blough#2015_season",
+                    vec![]
+                ),
+                (
+                    "https://www.lowes.com/pl/Cordless--Drills/4294607722?refinement=4294776932",
+                    vec![]
+                ),
+            ]
+        )
+    }
 }
