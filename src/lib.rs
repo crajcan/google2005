@@ -44,11 +44,12 @@ fn build(parsed: &Vec<(&str, Vec<&str>)>) -> Result<String, MyError> {
     results.push_str("<!DOCTYPE html>");
     results.push_str(r#"<html lang="en">"#);
 
-    for line in parsed {
+    for (i, line) in parsed.iter().enumerate() {
         let url = decode(line.0).unwrap();
 
         results.push_str(&format!(
-            r#"<p><a href={}>{}</a></br>"#,
+            r#"<p><em>{}. </em><a href={}>{}</a></br>"#,
+            i + 1,
             url,
             line.1.join(" ")
         ));
