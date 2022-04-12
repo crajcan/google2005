@@ -6,6 +6,7 @@ mod filter;
 use filter::filtered_links;
 use scraper::Html;
 use std::fmt::Debug;
+use urlencoding::decode;
 
 #[derive(Debug)]
 pub struct MyError {
@@ -38,45 +39,22 @@ pub async fn search_for_web_results(query: &str) -> Result<String, reqwest::Erro
     Ok(body)
 }
 
-fn build(parsed: impl Debug) -> Result<String, MyError> {
-    let results = format!("parsed: {:#?}", parsed);
+fn build(parsed: &Vec<(&str, Vec<&str>)>) -> Result<String, MyError> {
+    let mut results = "".to_string();
+    results.push_str("<!DOCTYPE html>");
+    results.push_str(r#"<html lang="en">"#);
+
+    for line in parsed {
+        let url = decode(line.0).unwrap();
+
+        results.push_str(&format!(
+            r#"<p><a href={}>{}</a></br>"#,
+            url,
+            line.1.join(" ")
+        ));
+        results.push_str(&format!(r#"<span>{}</span></p>"#, url));
+    }
+    results.push_str("</html>");
 
     Ok(results)
-}
-
-fn between(start: &str, end: &str, s: &str) -> String {
-    let start_index = s.find(start).unwrap();
-    let end_index = s.find(end).unwrap();
-    let between = &s[start_index + start.len()..end_index];
-    between.to_string()
-}
-
-fn bookended_with(start: &str, end: &str, s: &str) -> String {
-    let start_index = s.find(start).unwrap() - start.len();
-    let end_index = s.find(end).unwrap() + end.len();
-    let between = &s[start_index + start.len()..end_index];
-    between.to_string()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    // #[tokio::test]
-    #[test]
-    fn test_between() {
-        let input = "http://localhost:7878/url?q=https://www.sbnation.com/authors/jon-bois&sa=U&ved=2ahUKEwj91bWk2IT3AhV1omoFHTGiCBgQFnoECAwQAg&usg=AOvVaw0tLu83JeMGMgnFF9iLD2uA";
-
-        assert_eq!(
-            between("url?q=", "&sa=U", input),
-            "https://www.sbnation.com/authors/jon-bois"
-        )
-    }
-
-    #[test]
-    fn test_bookended_with() {
-        let input = "fooo<a>bar</a>baz";
-
-        assert_eq!(bookended_with("<a>", "</a>", input), "<a>bar</a>")
-    }
 }
