@@ -1,14 +1,17 @@
 use reqwest::Client;
-
-mod parser;
-use parser::parse;
-mod filter;
 use askama::Template;
-use filter::{filtered_links, SearchResult};
-use scraper::Html;
 use serde::Serialize;
+use scraper::Html;
 use std::fmt::Debug;
 use urlencoding::decode;
+
+mod parser;
+mod search_result;
+mod filter;
+
+use filter::filtered_links;
+use search_result::SearchResult;
+use parser::parse;
 
 #[derive(Debug, Serialize)]
 struct DecodedResult {

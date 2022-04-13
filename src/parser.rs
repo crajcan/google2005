@@ -1,4 +1,4 @@
-use crate::filter::SearchResult;
+use crate::search_result::SearchResult;
 use scraper::{ElementRef, Html, Selector};
 
 pub fn parse(dom: &Html) -> Vec<SearchResult> {
