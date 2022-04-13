@@ -47,6 +47,7 @@ fn between<'a, 'b>(start: &'a str, end: &'a str, s: &'b str) -> &'b str {
     between
 }
 
+#[allow(dead_code)]
 fn bookended_with(start: &str, end: &str, s: &str) -> String {
     let start_index = s.find(start).unwrap() - start.len();
     let end_index = s.find(end).unwrap() + end.len();

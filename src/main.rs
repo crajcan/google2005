@@ -1,11 +1,7 @@
-use std::fs::File;
-use std::io::prelude::*;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
-use tokio::time::{sleep, Duration};
 
 extern crate google2005;
-use google2005::search_for_web_results;
 
 #[tokio::main]
 async fn main() {

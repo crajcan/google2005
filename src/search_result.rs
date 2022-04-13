@@ -1,4 +1,3 @@
-use askama::Template;
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]

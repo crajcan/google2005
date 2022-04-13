@@ -4,7 +4,7 @@ use scraper::{ElementRef, Html, Selector};
 pub fn parse(dom: &Html) -> Vec<SearchResult> {
     links(dom)
         .iter()
-        .map(|h1| SearchResult::new(get_href(*h1), get_text(*h1)))
+        .map(|a| SearchResult::new(get_href(*a), get_text(*a)))
         .collect::<Vec<_>>()
 }
 
@@ -31,6 +31,7 @@ fn links(fragment: &Html) -> Vec<ElementRef> {
     get_elems(fragment, "a")
 }
 
+#[allow(dead_code)]
 fn h1s(fragment: &Html) -> Vec<ElementRef> {
     get_elems(fragment, "h1")
 }
@@ -101,7 +102,8 @@ mod test {
         );
     }
 
-    #[test]
+    // #[test]
+    #[allow(dead_code)]
     fn test_h1s() {
         let html = r#"
             <html>
