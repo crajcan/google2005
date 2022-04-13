@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Google2005</title>
+</head>
+
+<body>
+    <h1>
+        hello {{ name }}
+    </h1>
+    {% for result in results %}
+    <p>
+        <em>{{loop.index}}. </em>
+        <a href={{result.url}}>{{result.title}}</a></br>
+        <span>{{result.url}}</span>
+    </p>
+    {% endfor %}
+</body>
+
+</html>

@@ -1,8 +1,11 @@
-#[derive(Debug)]
-pub struct SearchResult<'a> {
-    url: &'a str,
-    title: Vec<&'a str>,
-}
+use askama::Template;
+use serde::Serialize;
+
+    #[derive(Debug, Serialize)]
+    pub struct SearchResult<'a> {
+        url: &'a str,
+        title: Vec<&'a str>,
+    }
 
 //use filter to filter out links that contain "search?q=""
 pub fn filtered_links<'a>(results: &'a mut Vec<SearchResult<'a>>) -> &'a mut Vec<SearchResult<'a>> {

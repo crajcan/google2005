@@ -3,12 +3,27 @@ use reqwest::Client;
 mod parser;
 use parser::parse;
 mod filter;
+use askama::Template;
 use filter::{filtered_links, SearchResult};
 use scraper::Html;
+use serde::Serialize;
 use std::fmt::Debug;
 use urlencoding::decode;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
+struct DecodedResult {
+    url: String,
+    title: String,
+}
+
+#[derive(Debug, Serialize, Template)]
+#[template(path = "search.html")]
+pub struct SearchResultsPage {
+    name: String,
+    results: Vec<DecodedResult>,
+}
+
+#[derive(Debug, Serialize)]
 pub struct MyError {
     report: String,
 }
@@ -19,7 +34,9 @@ pub async fn google(query: &str) -> Result<String, MyError> {
             let dom = Html::parse_document(&results);
             let mut links = parse(&dom);
             let filtered_links = filtered_links(&mut links);
-            build(filtered_links)
+            let page = build(filtered_links).unwrap();
+            let html = page.render().unwrap();
+            Ok(html)
         }
         Err(e) => {
             println!("error: {}", e);
@@ -39,23 +56,21 @@ pub async fn search_for_web_results(query: &str) -> Result<String, reqwest::Erro
     Ok(body)
 }
 
-fn build(parsed: &Vec<SearchResult>) -> Result<String, MyError> {
-    let mut results = "".to_string();
-    results.push_str("<!DOCTYPE html>");
-    results.push_str(r#"<html lang="en">"#);
+fn build<'a>(parsed: &Vec<SearchResult>) -> Result<SearchResultsPage, MyError> {
+    let mut results: Vec<DecodedResult> = vec![];
 
-    for (i, search_result) in parsed.iter().enumerate() {
-        let url = decode(search_result.url()).unwrap();
-
-        results.push_str(&format!(
-            r#"<p><em>{}. </em><a href={}>{}</a></br>"#,
-            i + 1,
-            url,
-            search_result.title().join(" ")
-        ));
-        results.push_str(&format!(r#"<span>{}</span></p>"#, url));
+    for result in parsed {
+        let decoded_url = decode(result.url()).unwrap();
+        let joined_title = result.title().join(" ");
+        let decoded_title = decode(&joined_title).unwrap();
+        results.push(DecodedResult {
+            url: decoded_url.to_string(),
+            title: decoded_title.to_string(),
+        });
     }
-    results.push_str("</html>");
 
-    Ok(results)
+    Ok(SearchResultsPage {
+        name: "Carson".to_string(),
+        results: results,
+    })
 }
