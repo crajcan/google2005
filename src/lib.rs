@@ -1,17 +1,17 @@
-use reqwest::Client;
 use askama::Template;
-use serde::Serialize;
+use reqwest::Client;
 use scraper::Html;
+use serde::Serialize;
 use std::fmt::Debug;
 use urlencoding::decode;
 
+mod filter;
 mod parser;
 mod search_result;
-mod filter;
 
 use filter::filtered_links;
-use search_result::SearchResult;
 use parser::parse;
+use search_result::SearchResult;
 
 #[derive(Debug, Serialize)]
 struct DecodedResult {
@@ -22,7 +22,6 @@ struct DecodedResult {
 #[derive(Debug, Serialize, Template)]
 #[template(path = "search.html")]
 pub struct SearchResultsPage {
-    name: String,
     results: Vec<DecodedResult>,
 }
 
@@ -35,18 +34,20 @@ pub async fn google(query: &str) -> Result<String, MyError> {
     match search_for_web_results(query).await {
         Ok(results) => {
             let dom = Html::parse_document(&results);
+
             let mut links = parse(&dom);
+
             let filtered_links = filtered_links(&mut links);
+
             let page = build(filtered_links).unwrap();
+
             let html = page.render().unwrap();
+
             Ok(html)
         }
-        Err(e) => {
-            println!("error: {}", e);
-            Err(MyError {
-                report: e.to_string(),
-            })
-        }
+        Err(e) => Err(MyError {
+            report: e.to_string(),
+        }),
     }
 }
 
@@ -72,7 +73,6 @@ fn build<'a>(parsed: &Vec<SearchResult>) -> Result<SearchResultsPage, MyError> {
     }
 
     Ok(SearchResultsPage {
-        name: "Carson".to_string(),
         results: results,
     })
 }
