@@ -62,10 +62,9 @@ fn build<'a>(parsed: &Vec<SearchResult>) -> Result<SearchResultsPage, MyError> {
     for result in parsed {
         let decoded_url = decode(result.url()).unwrap();
         let joined_title = result.title().join(" ");
-        let decoded_title = decode(&joined_title).unwrap();
         results.push(DecodedResult {
             url: decoded_url.to_string(),
-            title: decoded_title.to_string(),
+            title: joined_title.to_string(),
         });
     }
 
