@@ -6,6 +6,8 @@ use std::fmt::Display;
 pub struct Google2005Error {
     user_error: Option<String>,
     internal_error: Option<String>,
+    pub status_code: u16,
+    pub status: String,
 }
 
 impl Google2005Error {
@@ -13,6 +15,14 @@ impl Google2005Error {
         Google2005Error {
             user_error: user_error.map(|s| s.to_string()),
             internal_error: internal_error.map(|s| s.to_string()),
+            status_code: match user_error {
+                Some(_) => 400,
+                None => 500,
+            },
+            status: match user_error {
+                Some(_) => "Bad Request".to_string(),
+                None => "Internal Server Error".to_string(),
+            },
         }
     }
 }

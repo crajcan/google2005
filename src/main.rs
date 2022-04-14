@@ -4,6 +4,8 @@ use tokio::net::{TcpListener, TcpStream};
 
 extern crate google2005;
 
+const SEARCH_URI: &'static str = "GET /search?q=";
+
 #[tokio::main]
 async fn main() {
     let listener: tokio::net::TcpListener = TcpListener::bind("127.0.0.1:7878").await.unwrap();
@@ -31,23 +33,9 @@ async fn handle_connection(mut stream: TcpStream) {
     let mut buffer = [0; 512];
     stream.read(&mut buffer).await.unwrap();
 
-    let search = b"GET /search?q=";
+    let response = Response::new(&buffer).await;
 
-    let (status_line, contents) = if buffer.starts_with(search) {
-        let contents = html_search_response(&query(&buffer)).await;
-        ("HTTP/1.1 200 OK", contents.unwrap())
-    } else {
-        ("HTTP/1.1 404 NOT FOUND", "Not Found".to_string())
-    };
-
-    let response = format!(
-        "{}\r\nContent-Length: {}\r\n\r\n{}",
-        status_line,
-        contents.len(),
-        contents
-    );
-
-    stream.write(response.as_bytes()).await.unwrap();
+    stream.write(response.render().as_bytes()).await.unwrap();
     stream.flush().await.unwrap();
 
     println!("\n---------------------------------------------------------------\n\n");
@@ -57,4 +45,40 @@ async fn html_search_response(query: &str) -> Result<String, google2005::Google2
     let search_results = google2005::google(query).await?;
 
     Ok(search_results.render()?)
+}
+
+struct Response {
+    contents: String,
+    status_line: String,
+}
+
+impl Response {
+    async fn new(buffer: &[u8]) -> Response {
+        if !buffer.starts_with(SEARCH_URI.as_bytes()) {
+            return Response {
+                contents: "".to_string(),
+                status_line: format!("HTTP/1.1 404 Not Found"),
+            };
+        }
+
+        match html_search_response(&query(&buffer)).await {
+            Ok(contents) => Response {
+                contents,
+                status_line: "HTTP/1.1 200 OK".to_string(),
+            },
+            Err(e) => Response {
+                contents: format!("{}", e),
+                status_line: format!("HTTP/1.1 {} {}", e.status_code, e.status),
+            },
+        }
+    }
+
+    fn render(&self) -> String {
+        format!(
+            "{}\r\nContent-Length: {}\r\n\r\n{}",
+            self.status_line,
+            self.contents.len(),
+            self.contents
+        )
+    }
 }
