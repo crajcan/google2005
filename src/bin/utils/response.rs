@@ -1,3 +1,4 @@
+use crate::utils::request;
 use askama::Template;
 
 const SEARCH_URI: &'static str = "GET /search?q=";
@@ -16,7 +17,7 @@ impl Response {
             };
         }
 
-        match Self::html_search_response(&Self::query(&buffer)).await {
+        match Self::html_search_response(&request::query(&buffer)).await {
             Ok(contents) => Response {
                 contents,
                 status_line: "HTTP/1.1 200 OK".to_string(),
@@ -32,15 +33,6 @@ impl Response {
         let search_results = google2005::google(query).await?;
 
         Ok(search_results.render()?)
-    }
-
-    fn query(buffer: &[u8]) -> String {
-        let after_equals = &buffer[14..];
-        let until_space = after_equals.split(|c| *c == b' ').next().unwrap();
-        let string_query = String::from_utf8_lossy(until_space);
-        println!("***** string query: {}******", string_query);
-
-        string_query.to_string()
     }
 
     pub fn render(&self) -> String {
