@@ -12,12 +12,12 @@ struct DecodedResult {
 
 #[derive(Debug, Serialize, Template)]
 #[template(path = "search.html")]
-pub struct SearchResultsPage {
+pub struct SearchResultsResponse {
     results: Vec<DecodedResult>,
 }
 
-impl SearchResultsPage {
-    pub fn new(parsed: &SearchResults) -> Result<SearchResultsPage, Google2005Error> {
+impl SearchResultsResponse {
+    pub fn new(parsed: &SearchResults) -> Result<SearchResultsResponse, Google2005Error> {
         let mut results: Vec<DecodedResult> = vec![];
 
         for result in &parsed.results {
@@ -29,6 +29,6 @@ impl SearchResultsPage {
             });
         }
 
-        Ok(SearchResultsPage { results: results })
+        Ok(SearchResultsResponse { results: results })
     }
 }

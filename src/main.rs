@@ -1,3 +1,4 @@
+use askama::Template;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 
@@ -33,7 +34,7 @@ async fn handle_connection(mut stream: TcpStream) {
     let search = b"GET /search?q=";
 
     let (status_line, contents) = if buffer.starts_with(search) {
-        let contents = google2005::google(&query(&buffer)).await;
+        let contents = html_search_response(&query(&buffer)).await;
         ("HTTP/1.1 200 OK", contents.unwrap())
     } else {
         ("HTTP/1.1 404 NOT FOUND", "Not Found".to_string())
@@ -46,10 +47,14 @@ async fn handle_connection(mut stream: TcpStream) {
         contents
     );
 
-    // println!("Response: {}", response);
-
     stream.write(response.as_bytes()).await.unwrap();
     stream.flush().await.unwrap();
 
     println!("\n---------------------------------------------------------------\n\n");
+}
+
+async fn html_search_response(query: &str) -> Result<String, google2005::Google2005Error> {
+    let search_results = google2005::google(query).await?;
+
+    Ok(search_results.render()?)
 }

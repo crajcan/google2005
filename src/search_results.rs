@@ -1,9 +1,18 @@
 use crate::parser::parse;
 use crate::search_result::SearchResult;
 use scraper::Html;
+use std::ops::Deref;
 
 pub struct SearchResults<'a> {
     pub results: Vec<SearchResult<'a>>,
+}
+
+impl<'a> Deref for SearchResults<'a> {
+    type Target = Vec<SearchResult<'a>>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.results
+    }
 }
 
 impl<'a> SearchResults<'a> {
@@ -18,11 +27,8 @@ impl<'a> SearchResults<'a> {
         self.strip_analytics_bs();
         self.remove_redundant_pages();
 
-        if self.results.len() != 10 {
-            println!(
-                "Error: Should return 10 links, {} links found",
-                self.results.len()
-            );
+        if self.len() != 10 {
+            println!("Error: Should return 10 links, {} links found", self.len());
 
             println!("{:#?}", self.results);
         }
@@ -93,29 +99,35 @@ mod test {
 
     #[test]
     fn test_redundant_pages() {
-        let mut search_results = SearchResults { results: vec![
-            SearchResult::new(
-                "https://en.wikipedia.org/wiki/David_Blough#2015_season",
-                vec![],
-            ),
-            SearchResult::new(
-                "https://en.wikipedia.org/wiki/David_Blough#College_Career",
-                vec![],
-            ),
-            SearchResult::new(
-                "https://www.lowes.com/pl/Cordless--Drills/4294607722?refinement=4294776932",
-                vec![],
-            ),
-            SearchResult::new(
-                "https://www.lowes.com/pl/Cordless--Drills/4294607722?refinement=2347815098",
-                vec![],
-            ),
-        ]};
+        let mut search_results = SearchResults {
+            results: vec![
+                SearchResult::new(
+                    "https://en.wikipedia.org/wiki/David_Blough#2015_season",
+                    vec![],
+                ),
+                SearchResult::new(
+                    "https://en.wikipedia.org/wiki/David_Blough#College_Career",
+                    vec![],
+                ),
+                SearchResult::new(
+                    "https://www.lowes.com/pl/Cordless--Drills/4294607722?refinement=4294776932",
+                    vec![],
+                ),
+                SearchResult::new(
+                    "https://www.lowes.com/pl/Cordless--Drills/4294607722?refinement=2347815098",
+                    vec![],
+                ),
+            ],
+        };
 
         search_results.remove_redundant_pages();
 
         assert_eq!(
-            search_results.results.iter().map(|l| l.url).collect::<Vec<&str>>(),
+            search_results
+                .results
+                .iter()
+                .map(|l| l.url)
+                .collect::<Vec<&str>>(),
             vec![
                 "https://en.wikipedia.org/wiki/David_Blough#2015_season",
                 "https://www.lowes.com/pl/Cordless--Drills/4294607722?refinement=4294776932",
