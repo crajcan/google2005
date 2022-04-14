@@ -2,7 +2,7 @@ use askama::Template;
 use serde::Serialize;
 use urlencoding::decode;
 
-use crate::{search_result::SearchResult, utils::google2005_error::Google2005Error};
+use crate::{search_results::SearchResults, utils::google2005_error::Google2005Error};
 
 #[derive(Debug, Serialize)]
 struct DecodedResult {
@@ -17,10 +17,10 @@ pub struct SearchResultsPage {
 }
 
 impl SearchResultsPage {
-    pub fn new(parsed: &Vec<SearchResult>) -> Result<SearchResultsPage, Google2005Error> {
+    pub fn new(parsed: &SearchResults) -> Result<SearchResultsPage, Google2005Error> {
         let mut results: Vec<DecodedResult> = vec![];
 
-        for result in parsed {
+        for result in &parsed.results {
             let decoded_url = decode(result.url()).unwrap();
             let joined_title = result.title().join(" ");
             results.push(DecodedResult {

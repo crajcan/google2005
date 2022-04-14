@@ -1,43 +1,58 @@
+use crate::parser::parse;
 use crate::search_result::SearchResult;
+use scraper::Html;
 
-pub fn filtered_links<'a>(results: &'a mut Vec<SearchResult<'a>>) -> &'a mut Vec<SearchResult<'a>> {
-    remove_junk(results);
-    strip_analytics_bs(results);
-    remove_redundant_pages(results);
-
-    if results.len() != 10 {
-        println!(
-            "Error: Should return 10 links, {} links found",
-            results.len()
-        );
-
-        println!("{:#?}", results);
-    }
-
-    results
+pub struct SearchResults<'a> {
+    pub results: Vec<SearchResult<'a>>,
 }
 
-fn remove_junk(results: &mut Vec<SearchResult>) {
-    results.retain(|search_result| !search_result.is_junk());
-}
-
-fn strip_analytics_bs(results: &mut Vec<SearchResult>) {
-    for result in results.iter_mut() {
-        result.url = between("url?q=", "&sa=U", result.url)
-    }
-}
-
-fn remove_redundant_pages(results: &mut Vec<SearchResult>) {
-    let mut unique_pages: Vec<String> = vec![];
-
-    results.retain(|result| {
-        if unique_pages.contains(&result.web_page().to_string()) {
-            false
-        } else {
-            unique_pages.push(result.web_page().to_string());
-            true
+impl<'a> SearchResults<'a> {
+    pub fn new(dom: &'a Html) -> Self {
+        SearchResults {
+            results: parse(&dom),
         }
-    });
+    }
+
+    pub fn filter(&mut self) -> &mut Self {
+        self.remove_junk();
+        self.strip_analytics_bs();
+        self.remove_redundant_pages();
+
+        if self.results.len() != 10 {
+            println!(
+                "Error: Should return 10 links, {} links found",
+                self.results.len()
+            );
+
+            println!("{:#?}", self.results);
+        }
+
+        self
+    }
+
+    fn remove_junk(&mut self) {
+        self.results
+            .retain(|search_result| !search_result.is_junk());
+    }
+
+    fn strip_analytics_bs(&mut self) {
+        for result in self.results.iter_mut() {
+            result.url = between("url?q=", "&sa=U", result.url)
+        }
+    }
+
+    fn remove_redundant_pages(&mut self) {
+        let mut unique_pages: Vec<String> = vec![];
+
+        self.results.retain(|result| {
+            if unique_pages.contains(&result.web_page().to_string()) {
+                false
+            } else {
+                unique_pages.push(result.web_page().to_string());
+                true
+            }
+        });
+    }
 }
 
 fn between<'a, 'b>(start: &'a str, end: &'a str, s: &'b str) -> &'b str {
@@ -78,7 +93,7 @@ mod test {
 
     #[test]
     fn test_redundant_pages() {
-        let mut links = vec![
+        let mut search_results = SearchResults { results: vec![
             SearchResult::new(
                 "https://en.wikipedia.org/wiki/David_Blough#2015_season",
                 vec![],
@@ -95,12 +110,12 @@ mod test {
                 "https://www.lowes.com/pl/Cordless--Drills/4294607722?refinement=2347815098",
                 vec![],
             ),
-        ];
+        ]};
 
-        remove_redundant_pages(&mut links);
+        search_results.remove_redundant_pages();
 
         assert_eq!(
-            links.iter().map(|l| l.url).collect::<Vec<&str>>(),
+            search_results.results.iter().map(|l| l.url).collect::<Vec<&str>>(),
             vec![
                 "https://en.wikipedia.org/wiki/David_Blough#2015_season",
                 "https://www.lowes.com/pl/Cordless--Drills/4294607722?refinement=4294776932",
