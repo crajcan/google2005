@@ -4,11 +4,16 @@ use serde::Serialize;
 pub struct SearchResult<'a> {
     pub url: &'a str,
     title: Vec<&'a str>,
+    pub description: Vec<&'a str>,
 }
 
 impl<'a> SearchResult<'a> {
     pub fn new(url: &'a str, title: Vec<&'a str>) -> Self {
-        SearchResult { url, title }
+        SearchResult {
+            url,
+            title,
+            description: vec![],
+        }
     }
 
     pub fn url(&self) -> &str {

@@ -324,6 +324,7 @@ name = "google2005"
 version = "0.1.0"
 dependencies = [
  "askama",
+ "ego-tree",
  "reqwest",
  "scraper",
  "serde",

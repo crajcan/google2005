@@ -1,11 +1,47 @@
+use std::ops::Deref;
+
 use crate::search_result::SearchResult;
-use scraper::{ElementRef, Html, Selector};
+use ego_tree::NodeRef;
+use scraper::{ElementRef, Html, Node, Selector};
 
 pub fn parse(dom: &Html) -> Vec<SearchResult> {
-    links(dom)
-        .iter()
-        .map(|a| SearchResult::new(get_href(*a), get_text(*a)))
-        .collect::<Vec<_>>()
+    let body = dom
+        .select(&Selector::parse("body").unwrap())
+        .next()
+        .unwrap();
+
+    let mut search_results = vec![];
+    let node_ref = Deref::deref(&body);
+
+    walk(node_ref, &mut search_results);
+
+    search_results
+}
+
+fn walk<'a>(e: &NodeRef<'a, Node>, search_results: &mut Vec<SearchResult<'a>>) {
+    let v = e.value();
+
+    match v {
+        Node::Element(element) => {
+            if element.name() == "a" {
+                let url = element.attr("href").unwrap();
+                println!("element: {:?}", element);
+                let title = element.attr("text").unwrap();
+
+                search_results.push(SearchResult::new(url, vec![title]));
+            } else if element.name() == "span" {
+                let description = element.attr("text").unwrap();
+
+
+                search_results.last_mut().unwrap().description = vec![description];
+            } else {
+                for child in e.children() {
+                    walk(&child, search_results);
+                }
+            }
+        }
+        _ => {}
+    }
 }
 
 fn get_text(element: ElementRef) -> Vec<&str> {
