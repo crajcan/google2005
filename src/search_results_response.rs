@@ -21,8 +21,9 @@ impl SearchResultsResponse {
         let mut results: Vec<DecodedResult> = vec![];
 
         for result in &parsed.results {
-            let decoded_url = decode(result.url()).unwrap();
-            let joined_title = result.title().join(" ");
+            let decoded_url = decode(result.url).unwrap();
+            let joined_title = result.title.as_ref().unwrap().join(" ");
+
             results.push(DecodedResult {
                 url: decoded_url.to_string(),
                 title: joined_title.to_string(),

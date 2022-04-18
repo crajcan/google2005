@@ -103,19 +103,15 @@ mod test {
             results: vec![
                 SearchResult::new(
                     "https://en.wikipedia.org/wiki/David_Blough#2015_season",
-                    vec![],
                 ),
                 SearchResult::new(
                     "https://en.wikipedia.org/wiki/David_Blough#College_Career",
-                    vec![],
                 ),
                 SearchResult::new(
                     "https://www.lowes.com/pl/Cordless--Drills/4294607722?refinement=4294776932",
-                    vec![],
                 ),
                 SearchResult::new(
                     "https://www.lowes.com/pl/Cordless--Drills/4294607722?refinement=2347815098",
-                    vec![],
                 ),
             ],
         };

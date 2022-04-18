@@ -3,25 +3,17 @@ use serde::Serialize;
 #[derive(Debug, Serialize)]
 pub struct SearchResult<'a> {
     pub url: &'a str,
-    title: Vec<&'a str>,
-    pub description: Vec<&'a str>,
+    pub title: Option<Vec<&'a str>>,
+    pub description: Option<Vec<&'a str>>,
 }
 
 impl<'a> SearchResult<'a> {
-    pub fn new(url: &'a str, title: Vec<&'a str>) -> Self {
+    pub fn new(url: &'a str) -> Self {
         SearchResult {
             url,
-            title,
-            description: vec![],
+            title: None,
+            description: None,
         }
-    }
-
-    pub fn url(&self) -> &str {
-        self.url
-    }
-
-    pub fn title(&self) -> &Vec<&str> {
-        &self.title
     }
 
     pub fn is_junk(&self) -> bool {
@@ -39,7 +31,7 @@ impl<'a> SearchResult<'a> {
     }
 
     fn is_google_logo(&self) -> bool {
-        *self.title == vec!["G", "o", "o", "g", "l", "e"]
+        self.title == Some(vec!["G", "o", "o", "g", "l", "e"])
     }
 
     fn is_image_link(&self) -> bool {
@@ -52,12 +44,17 @@ impl<'a> SearchResult<'a> {
     }
 
     fn is_google_logistics(&self) -> bool {
-        (self.title.join(" ") == "Privacy")
-            || (self.title.join(" ") == "Learn more")
-            || (self.title.join(" ") == "Settings")
-            || (self.title.join(" ") == "Terms")
-            || (self.title.join(" ") == "Sign in")
-            || (self.title.join(" ") == "Search tools")
+        match &self.title {
+            Some(title) => {
+                (title.join(" ") == "Privacy")
+                    || (title.join(" ") == "Learn more")
+                    || (title.join(" ") == "Settings")
+                    || (title.join(" ") == "Terms")
+                    || (title.join(" ") == "Sign in")
+                    || (title.join(" ") == "Search tools")
+            }
+            None => false,
+        }
     }
 
     pub fn web_page(&self) -> &str {
@@ -80,10 +77,10 @@ mod tests {
 
     #[test]
     fn test_web_page_returns_segment_before_question_mark() {
-        let result = SearchResult::new(
+        let mut result = SearchResult::new(
             "https://www.lowes.com/pl/Cordless--Drills/4294607722?refinement=4294776932",
-            vec!["Cordless", "Drills"],
         );
+        result.title = Some(vec!["Cordless", "Drills"]);
 
         assert_eq!(
             result.web_page(),
@@ -93,10 +90,9 @@ mod tests {
 
     #[test]
     fn test_web_page_returns_segment_before_pound_sign() {
-        let result = SearchResult::new(
-            "https://en.wikipedia.org/wiki/David_Blough#2015_season",
-            vec!["David", "Blough"],
-        );
+        let mut result =
+            SearchResult::new("https://en.wikipedia.org/wiki/David_Blough#2015_season");
+        result.title = Some(vec!["David", "Blough"]);
 
         assert_eq!(
             result.web_page(),
@@ -106,10 +102,9 @@ mod tests {
 
     #[test]
     fn test_web_page_returns_segment_before_percent_sign() {
-        let result = SearchResult::new(
-            "https://en.wikipedia.org/wiki/David_Blough%232015_season",
-            vec!["David", "Blough"],
-        );
+        let mut result =
+            SearchResult::new("https://en.wikipedia.org/wiki/David_Blough%232015_season");
+        result.title = Some(vec!["David", "Blough"]);
 
         assert_eq!(
             result.web_page(),
