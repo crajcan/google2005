@@ -30,7 +30,16 @@ fn walk<'a>(e: &NodeRef<'a, Node>, search_results: &mut Vec<SearchResult<'a>>) {
                 let url = element.attr("href").unwrap();
                 let title = copy_from_headings(e);
 
-                search_results.push(SearchResult::new(url));
+                let mut search_result = SearchResult::new(url);
+                search_result.title = Some(title);
+
+                search_results.push(search_result);
+            } else if element.name() == "span" {
+                if search_results.len() != 0 && search_results.last().unwrap().description.is_none()
+                {
+                    let description = all_copy(e);
+                    search_results.last_mut().unwrap().description = Some(description);
+                }
             } else {
                 for child in e.children() {
                     walk(&child, search_results);
@@ -60,6 +69,27 @@ fn copy_from_headings<'a>(e: &NodeRef<'a, Node>) -> Vec<&'a str> {
                     copy.append(&mut copy_from_headings(&child));
                 }
             }
+        }
+        _ => {}
+    }
+
+    copy
+}
+
+//gets all text from an html element and it's offspring
+fn all_copy<'a>(e: &NodeRef<'a, Node>) -> Vec<&'a str> {
+    let mut copy = vec![];
+
+    let v = e.value();
+
+    match v {
+        Node::Element(element) => {
+            for child in e.children() {
+                copy.append(&mut all_copy(&child));
+            }
+        }
+        Node::Text(text) => {
+            copy.push(&(**text));
         }
         _ => {}
     }
@@ -214,15 +244,26 @@ mod test {
     }
 
     #[test]
-    fn test_str_in() {
-        let headings = &["h1", "h2", "h3", "h4", "h5", "h6"];
+    fn test_all_copy() {
+        let span = concat!(
+            "<span>Latest on QB David ",
+            "<em>Blough</em>",
+            " including news, stats, videos, highlights and more on NFL.com.",
+            "</span>"
+        );
 
-        assert!(str_in(headings, "h3"));
-        assert!(str_in(headings, "h6"));
-        assert!(!str_in(headings, "h7"));
+        let dom = Html::parse_document(span);
+        let selector = Selector::parse("span").unwrap();
+        let span = dom.select(&selector).next().unwrap();
+        let node_ref = Deref::deref(&span);
+
+        assert_eq!(
+            all_copy(node_ref),
+            vec![
+                "Latest on QB David ",
+                "Blough",
+                " including news, stats, videos, highlights and more on NFL.com."
+            ]
+        );
     }
-}
-
-fn str_in(list: &[&str], s: &str) -> bool {
-    list.iter().any(|x| *x == s)
 }
