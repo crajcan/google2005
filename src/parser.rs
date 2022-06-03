@@ -27,6 +27,7 @@ fn walk<'a>(e: &NodeRef<'a, Node>, search_results: &mut Vec<SearchResult<'a>>) {
     match v {
         Node::Element(element) => {
             if element.name() == "a" {
+                //create a search result for the elem and try to add a title
                 let url = element.attr("href").unwrap();
                 let title = copy_from_headings(e);
 
@@ -35,6 +36,7 @@ fn walk<'a>(e: &NodeRef<'a, Node>, search_results: &mut Vec<SearchResult<'a>>) {
 
                 search_results.push(search_result);
             } else if element.name() == "span" {
+                //add a decription the last search result if there is none
                 if search_results.len() != 0 && search_results.last().unwrap().description.is_none()
                 {
                     let description = all_copy(e);
@@ -58,12 +60,9 @@ fn copy_from_headings<'a>(e: &NodeRef<'a, Node>) -> Vec<&'a str> {
     match v {
         Node::Element(element) => {
             let name = element.name();
+
             if HEADINGS.contains(&name) {
-                for child in e.children() {
-                    if let Node::Text(text) = child.value() {
-                        copy.push(&(**text));
-                    }
-                }
+                return all_copy(e);
             } else {
                 for child in e.children() {
                     copy.append(&mut copy_from_headings(&child));
@@ -240,6 +239,28 @@ mod test {
         assert_eq!(
             copy_from_headings(node_ref),
             vec!["David Blough Stats, News and Video - QB | NFL.com"]
+        );
+    }
+
+    #[test]
+    fn test_copy_from_headings_with_interior_div() {
+        let anchor = concat!(
+            r#"<a href="/url?q=https://www.detroitlions.com/team/players-roster/david-blough/">"#,
+            r#"<h3 class="zBAuLc l97dzf">"#,
+            r#"<div class="BNeawe vvjwJb AP7Wnd">David Blough - Detroit Lions</div>"#,
+            "</h3>",
+            r#"<div class="BNeawe UPmit AP7Wnd">www.detroitlions.com &#8250; team &#8250; players-roster &#8250; david-blough</div>"#,
+            "</a>"
+        );
+
+        let dom = Html::parse_document(anchor);
+        let selector = Selector::parse("a").unwrap();
+        let a = dom.select(&selector).next().unwrap();
+        let node_ref = Deref::deref(&a);
+
+        assert_eq!(
+            copy_from_headings(node_ref),
+            vec!["David Blough - Detroit Lions"]
         );
     }
 
