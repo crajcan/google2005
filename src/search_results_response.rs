@@ -8,6 +8,7 @@ use crate::{search_results::SearchResults, utils::google2005_error::Google2005Er
 struct DecodedResult {
     url: String,
     title: String,
+    description: String,
 }
 
 #[derive(Debug, Serialize, Template)]
@@ -23,10 +24,15 @@ impl SearchResultsResponse {
         for result in &parsed.results {
             let decoded_url = decode(result.url).unwrap();
             let joined_title = result.title.as_ref().unwrap().join(" ");
+            let joined_description = match result.description.as_ref() {
+                Some(description) => description.join(" "),
+                None => String::from(""),
+            };
 
             results.push(DecodedResult {
                 url: decoded_url.to_string(),
                 title: joined_title.to_string(),
+                description: joined_description.to_string(),
             });
         }
 

@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, PartialEq)]
 pub struct SearchResult<'a> {
     pub url: &'a str,
     pub title: Option<Vec<&'a str>>,

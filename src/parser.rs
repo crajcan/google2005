@@ -2,7 +2,6 @@ use std::ops::Deref;
 
 use crate::search_result::SearchResult;
 use ego_tree::NodeRef;
-use scraper::node::Element;
 use scraper::{ElementRef, Html, Node, Selector};
 
 const HEADINGS: &'static [&'static str] = &["h1", "h2", "h3", "h4", "h5", "h6"];
@@ -35,17 +34,17 @@ fn walk<'a>(e: &NodeRef<'a, Node>, search_results: &mut Vec<SearchResult<'a>>) {
                 search_result.title = Some(title);
 
                 search_results.push(search_result);
-            } else if element.name() == "span" {
-                //add a decription the last search result if there is none
-                if search_results.len() != 0 && search_results.last().unwrap().description.is_none()
-                {
-                    let description = all_copy(e);
-                    search_results.last_mut().unwrap().description = Some(description);
-                }
             } else {
                 for child in e.children() {
                     walk(&child, search_results);
                 }
+            }
+        }
+        Node::Text(description) => {
+            //add a decription to the last search result if there is none
+            if search_results.len() != 0 && search_results.last().unwrap().description.is_none()
+            {
+                search_results.last_mut().unwrap().description = Some(vec![&(**description)]);
             }
         }
         _ => {}
@@ -127,6 +126,59 @@ fn h1s(fragment: &Html) -> Vec<ElementRef> {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn test_walk_scrapes_description() {
+        let section = concat!(
+            "<body>",
+            "<div>",
+            r#"<div class="ZINbbc luh4tb xpd O9g5cc uUPGi">"#,
+            r#"<div class="egMi0 kCrYT">"#,
+            r#"<a href="/url?q=https://www.foxsports.com/nfl/david-blough">"#,
+            r#"<h3 class="zBAuLc l97dzf">"#,
+            r#"<div class="BNeawe vvjwJb AP7Wnd">David Blough - NFL News, Rumors, &amp; Updates - FOX Sports</div>"#,
+            "</h3>",
+            r#"<div class="BNeawe UPmit AP7Wnd">www.foxsports.com &#8250; nfl &#8250; david-blough-player</div>"#,
+            "</a>",
+            "</div>",
+            r#"<div class="kCrYT"><div>"#,
+            r#"<div class="BNeawe s3v9rd AP7Wnd">"#,
+            "<div>",
+            "<div>",
+            r#"<div class="BNeawe s3v9rd AP7Wnd">Remains No. 3 QB Blough (coach's decision) is inactive for Thursday's game against the Bears. Impact While dressing as the No.</div>"#,
+            "</div>",
+            "</div>",
+            "</div>",
+            "</div>",
+            "</div>",
+            "</div>",
+            "</div>",
+            "</body>",
+        );
+
+        let body = Html::parse_document(section);
+        let elem = body 
+            .select(&Selector::parse("body").unwrap())
+            .next()
+            .unwrap();
+        let node_ref = Deref::deref(&elem);
+
+        let mut search_results = vec![];
+        walk(node_ref, &mut search_results);
+
+        assert_eq!(
+            search_results[0],
+            SearchResult { 
+                url: "/url?q=https://www.foxsports.com/nfl/david-blough",
+                title: Some(vec![
+                    "David Blough - NFL News, Rumors, & Updates - FOX Sports",
+                ]),
+                description: Some(vec![
+                    "Remains No. 3 QB Blough (coach's decision) is inactive for Thursday's game against the Bears. Impact While dressing as the No.",
+                ]),
+            }
+        );       
+    }
 
     #[test]
     fn test_get_text() {

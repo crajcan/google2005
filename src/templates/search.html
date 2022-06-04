@@ -12,9 +12,11 @@
     </h1>
     {% for result in results %}
     <p>
-        <em>{{loop.index}}. </em>
-        <a href={{result.url}}>{{result.title}}</a></br>
+        <em><b>{{loop.index}}. </b></em>
         <span>{{result.url}}</span>
+        <br />
+        <a href={{result.url}}>{{result.title}}</a></br>
+        <span>{{result.description}}</span>
     </p>
     {% endfor %}
 </body>
