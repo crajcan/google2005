@@ -15,10 +15,14 @@ struct DecodedResult {
 #[template(path = "search.html")]
 pub struct SearchResultsResponse {
     results: Vec<DecodedResult>,
+    query: String,
 }
 
 impl SearchResultsResponse {
-    pub fn new(parsed: &SearchResults) -> Result<SearchResultsResponse, Google2005Error> {
+    pub fn new(
+        parsed: &SearchResults,
+        query: &str,
+    ) -> Result<SearchResultsResponse, Google2005Error> {
         let mut results: Vec<DecodedResult> = vec![];
 
         for result in &parsed.results {
@@ -36,6 +40,9 @@ impl SearchResultsResponse {
             });
         }
 
-        Ok(SearchResultsResponse { results: results })
+        Ok(SearchResultsResponse {
+            results: results,
+            query: query.to_string(),
+        })
     }
 }
