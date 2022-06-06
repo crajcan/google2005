@@ -40,6 +40,13 @@ fn walk<'a>(e: &NodeRef<'a, Node>, search_results: &mut Vec<SearchResult<'a>>) {
                 if search_results.len() != 0
                 {
                     let description = all_copy(e);
+
+                    if description.contains(&"People also ask") {
+                        // pushing another (dummy) search result will avoid adding the
+                        // "people also ask" nonsense to our valid search results
+                        search_results.push(SearchResult::new(""));
+                    }
+
                     //add to description
                     search_results.last_mut().unwrap().add_to_description(description);
                 }

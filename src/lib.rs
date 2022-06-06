@@ -11,13 +11,13 @@ use search_results::SearchResults;
 use search_results_response::SearchResultsResponse;
 pub use utils::google2005_error::Google2005Error;
 
-use std::fs;
+// use std::fs;
 // use std::io::Write;
 
 #[allow(unused_variables)]
 pub async fn google(query: &str) -> Result<SearchResultsResponse, Google2005Error> {
     let response_body = request_search_from_google(query).await?;
-    let response_body = fs::read_to_string("test_seeds/cubs2.html").unwrap();
+    // let response_body = fs::read_to_string("test_seeds/cubs2.html").unwrap();
 
     // write to file
     // let mut file = fs::File::create("george_clooney.html").unwrap();
