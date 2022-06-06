@@ -36,6 +36,15 @@ fn walk<'a>(e: &NodeRef<'a, Node>, search_results: &mut Vec<SearchResult<'a>>) {
                 search_result.title = Some(title);
 
                 search_results.push(search_result);
+            } else if element.name() == "span" {
+                if search_results.len() != 0
+                {
+                    let description = all_copy(e);
+                    //add to description
+                    search_results.last_mut().unwrap().add_to_description(description);
+                }
+            } else if element.name() == "script" {
+                return
             } else {
                 for child in e.children() {
                     walk(&child, search_results);
@@ -44,9 +53,9 @@ fn walk<'a>(e: &NodeRef<'a, Node>, search_results: &mut Vec<SearchResult<'a>>) {
         }
         Node::Text(description) => {
             //add a decription to the last search result if there is none
-            if search_results.len() != 0 && search_results.last().unwrap().description.is_none()
+            if search_results.len() != 0
             {
-                search_results.last_mut().unwrap().description = Some(vec![&(**description)]);
+                search_results.last_mut().unwrap().add_to_description(vec![&(**description)]);
             }
         }
         _ => {}
@@ -181,6 +190,65 @@ mod test {
             }
         );       
     }
+
+    #[test]
+    fn test_walk_scrapes_description_with_time() {
+        let section = concat!(
+            r#"<div>"#,
+            r#"<div class="ZINbbc luh4tb xpd O9g5cc uUPGi">"#,
+            r#"<div class="egMi0 kCrYT">"#,
+            r#"<a href="/url?q=https://www.cbssports.com/mlb/teams/">"#,
+            r#"<h3 class="zBAuLc l97dzf">"#,
+            r#"<div class="BNeawe">Chicago Cubs News, Schedule - MLB - CBS Sports</div>"#,
+            r#"</h3>"#,
+            r#"<div class="BNeawe UPmit AP7Wnd">www.cbssports.com &#8250; mlb &#8250; teams &#8250; CHC &#8250; chicago-cubs</div>"#,
+            r#"</a>"#,
+            r#"</div>"#,
+            r#"<div class="kCrYT">"#,
+            r#"<div>"#,
+            r#"<div class="BNeawe s3v9rd AP7Wnd">"#,
+            r#"<div>"#,
+            r#"<div>"#,
+            r#"<div class="BNeawe s3v9rd AP7Wnd">"#,
+            r#"<span class="xUrNXd UMOHqf">21 hours ago</span>"#,
+            r#"<span class="xUrNXd UMOHqf"> · </span>"#,
+            r#"Get the latest news and information for the Chicago Cubs. 2022 season schedule, scores, stats, and highlights. Find out the latest on your favorite MLB ..."#,
+            r#"</div>"#,
+            r#"</div>"#,
+            r#"</div>"#,
+            r#"</div>"#,
+            r#"</div>"#,
+            r#"</div>"#,
+            r#"</div>"#,
+            r#"</div>"#,
+        );
+
+        let body = Html::parse_document(section);
+        let elem = body 
+            .select(&Selector::parse("body").unwrap())
+            .next()
+            .unwrap();
+        let node_ref = Deref::deref(&elem);
+
+        let mut search_results = vec![];
+        walk(node_ref, &mut search_results);
+
+        assert_eq!(
+            search_results[0],
+            SearchResult { 
+                url: "/url?q=https://www.cbssports.com/mlb/teams/",
+                title: Some(vec![
+                    "Chicago Cubs News, Schedule - MLB - CBS Sports",
+                ]),
+                description: Some(vec![
+                    "21 hours ago",
+                    " · ",
+                    "Get the latest news and information for the Chicago Cubs. 2022 season schedule, scores, stats, and highlights. Find out the latest on your favorite MLB ...",
+                ]),
+            }
+        );       
+    }
+
 
     #[test]
     fn test_get_text() {

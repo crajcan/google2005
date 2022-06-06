@@ -16,6 +16,14 @@ impl<'a> SearchResult<'a> {
         }
     }
 
+    pub fn add_to_description(&mut self, description: Vec<&'a str>) {
+        if self.description.is_none() {
+            self.description = Some(description);
+        } else {
+            self.description.as_mut().unwrap().extend(description);
+        }
+    }
+
     pub fn is_regular_result(&self) -> bool {
         !self.is_alternative_search()
             && !self.is_google_logo()
@@ -117,6 +125,19 @@ mod tests {
         assert_eq!(
             result.web_page(),
             "https://en.wikipedia.org/wiki/David_Blough",
+        )
+    }
+
+    #[test]
+    fn test_add_to_description() {
+        let mut result = SearchResult::new("https://www.lowes.com/");
+
+        result.add_to_description(vec!["Cordless Drills", "Miter Saws"]);
+        result.add_to_description(vec!["Screw Drivers"]);
+
+        assert_eq!(
+            result.description.unwrap(),
+            vec!["Cordless Drills", "Miter Saws", "Screw Drivers"]
         )
     }
 }
