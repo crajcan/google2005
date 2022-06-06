@@ -18,6 +18,7 @@ impl<'a> SearchResult<'a> {
 
     pub fn is_junk(&self) -> bool {
         self.is_alternative_search()
+            || !self.has_title_and_description()
             || self.is_google_logo()
             || self.is_image_link()
             || self.is_google_ad()
@@ -28,6 +29,13 @@ impl<'a> SearchResult<'a> {
         self.url.contains("search?q=")
             || self.url.contains("search?ie=")
             || self.url.contains("&ie=")
+    }
+
+    fn has_title_and_description(&self) -> bool {
+        self.title.is_some()
+            && !self.title.as_ref().unwrap().is_empty()
+            && self.description.is_some()
+            && !self.description.as_ref().unwrap().is_empty()
     }
 
     fn is_google_logo(&self) -> bool {

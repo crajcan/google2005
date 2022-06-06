@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::ops::Deref;
 
 use crate::search_result::SearchResult;
@@ -81,7 +83,7 @@ fn all_copy<'a>(e: &NodeRef<'a, Node>) -> Vec<&'a str> {
     let v = e.value();
 
     match v {
-        Node::Element(element) => {
+        Node::Element(_element) => {
             for child in e.children() {
                 copy.append(&mut all_copy(&child));
             }
