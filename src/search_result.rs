@@ -16,13 +16,13 @@ impl<'a> SearchResult<'a> {
         }
     }
 
-    pub fn is_junk(&self) -> bool {
-        self.is_alternative_search()
-            || !self.has_title_and_description()
-            || self.is_google_logo()
-            || self.is_image_link()
-            || self.is_google_ad()
-            || self.is_google_logistics()
+    pub fn is_regular_result(&self) -> bool {
+        !self.is_alternative_search()
+            && !self.is_google_logo()
+            && !self.is_image_link()
+            && !self.is_google_ad()
+            && !self.is_google_logistics()
+            && self.has_title_and_description()
     }
 
     fn is_alternative_search(&self) -> bool {

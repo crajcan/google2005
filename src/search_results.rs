@@ -38,7 +38,7 @@ impl<'a> SearchResults<'a> {
 
     fn remove_junk(&mut self) {
         self.results
-            .retain(|search_result| !search_result.is_junk());
+            .retain(|search_result| search_result.is_regular_result());
     }
 
     fn strip_analytics_bs(&mut self) {
