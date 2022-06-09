@@ -36,10 +36,11 @@ body {
 
 .next-page-link {
     text-decoration: none;
+    text-align: right;
 }
 
-.next-page-links a {
-    text-decoration: none;
+.next-page-link .page-number {
+    text-decoration: underline;
 }
 
 td.five,
@@ -47,17 +48,29 @@ td.two {
     vertical-align: top;
 }
 
-.zero {
-    color: #fcba03;
-    font: 24px garamond;
-}
-
 .two {
     color: #3b5ff9;
     font: 30px garamond;
+    padding-bottom: 25px;
+}
+
+.zero {
+    color: #e7b11d;
+    font: 24px garamond;
+    transform: scaleX(1.6);
+    width: 15px;
+}
+
+div.zero {
+    margin: 0;
+}
+
+.red {
+    color: #da334f;
 }
 
 .five {
-    color: #da334f;
-    font: 30px garamond;
+    color: green;
+    font: 24px garamond;
+    padding-top: 7px;
 }

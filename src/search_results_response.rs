@@ -19,7 +19,7 @@ struct DecodedResult {
 pub struct SearchResultsResponse {
     results: Vec<DecodedResult>,
     query: String,
-    start: u16,
+    response_start: u16,
     next_page_starts: Vec<u16>,
 }
 
@@ -48,7 +48,7 @@ impl SearchResultsResponse {
         Ok(SearchResultsResponse {
             results: results,
             query: query.search_string,
-            start: Self::response_start(query.start),
+            response_start: Self::response_start(query.start),
             next_page_starts: Self::next_page_starts(query.start),
         })
     }

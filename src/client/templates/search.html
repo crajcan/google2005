@@ -12,7 +12,7 @@
         Showing {{results.len()}} results for "{{query}}".
     </h3>
     <h4>
-        start: {{start}}
+        start: {{response_start}}
     </h4>
     <ul class="search-results-list">
         {% for result in results %}
@@ -35,8 +35,14 @@
             </td>
             {% for start in next_page_starts %}
             <td>
-                <a class="next-page-link" href="/search?q=cubs&start={{start}}">
-                    <div class="zero">0</div>
+                <a class="next-page-link " href="/search?q={{query}}&start={{start}}">
+                    {% let red -%}
+                    {% if response_start == start * 1 -%}
+                    {% let red = "red" -%}
+                    {% else -%}
+                    {% let red = "" -%}
+                    {% endif -%}
+                    <div class="zero {{red}}">0</div>
                     <div class="page-number">{{ (start / 10) + 1 }}</div>
                 </a>
             </td>
