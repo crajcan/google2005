@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Google2005</title>
+    <link rel="stylesheet" type="text/css" href="search.css">
 </head>
 
 <body>
@@ -16,15 +17,15 @@
     {% for result in results %}
     <p>
         <em><b>{{loop.index}}. </b></em>
-        <span>{{result.url}}</span>
-        <br />
         <a href={{result.url}}>{{result.title}}</a></br>
+        <span class="result-url">{{result.url}}</span>
+        <br />
         <span>{{result.description}}</span>
     </p>
     {% endfor %}
     <table>
         <tr>
-            <td style="vertical-align:top">
+            <td class="two">
                 <div>2</div>
             </td>
             {% for start in next_page_starts %}
@@ -35,7 +36,7 @@
                 </a>
             </td>
             {% endfor %}
-            <td style="vertical-align:top">
+            <td class="five">
                 <div>5</div>
             </td>
         </tr>

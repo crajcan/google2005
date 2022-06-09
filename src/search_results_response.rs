@@ -45,16 +45,11 @@ impl SearchResultsResponse {
             });
         }
 
-        let response_start = Self::response_start(query.start);
-        println!("repsonse_start: {}", response_start);
-        let next_page_starts = Self::next_page_starts(response_start);
-        println!("next_page_starts: {:?}", next_page_starts);
-
         Ok(SearchResultsResponse {
             results: results,
             query: query.search_string,
-            start: response_start,
-            next_page_starts: next_page_starts,
+            start: Self::response_start(query.start),
+            next_page_starts: Self::next_page_starts(query.start),
         })
     }
 
