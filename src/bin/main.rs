@@ -38,7 +38,6 @@ async fn handle_connection(mut stream: TcpStream) {
         Response::new(&buffer).await.render()
     };
 
-    println!("\nResponse: {}\n", response);
     stream.write(response.as_bytes()).await.unwrap();
     stream.flush().await.unwrap();
 

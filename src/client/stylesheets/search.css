@@ -1,12 +1,63 @@
+body {
+    font: 16px arial, san-serif;
+}
+
+.search-results-list {
+    list-style-type: none;
+}
+
+.search-result {
+    margin-bottom: 23px;
+}
+
+
+.search-result-link {
+    margin: 0;
+    font-weight: normal;
+}
+
+.search-result-link a {
+    color: #1122CC;
+}
+
+.search-result-url {
+    font-size: 13px;
+    color: #009933;
+}
+
+.search-result-description {
+    font-size: 13px;
+    color: #222222;
+}
+
+.next-page-links {
+    margin: auto;
+}
+
+.next-page-link {
+    text-decoration: none;
+}
+
+.next-page-links a {
+    text-decoration: none;
+}
+
 td.five,
 td.two {
     vertical-align: top;
 }
 
-h3 {
-    color: green;
+.zero {
+    color: #fcba03;
+    font: 24px garamond;
 }
 
-.result-url {
-    color: #009933;
+.two {
+    color: #3b5ff9;
+    font: 30px garamond;
+}
+
+.five {
+    color: #da334f;
+    font: 30px garamond;
 }

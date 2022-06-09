@@ -14,25 +14,30 @@
     <h4>
         start: {{start}}
     </h4>
-    {% for result in results %}
-    <p>
-        <em><b>{{loop.index}}. </b></em>
-        <a href={{result.url}}>{{result.title}}</a></br>
-        <span class="result-url">{{result.url}}</span>
-        <br />
-        <span>{{result.description}}</span>
-    </p>
-    {% endfor %}
-    <table>
+    <ul class="search-results-list">
+        {% for result in results %}
+        <li class="search-result">
+            <h3 class="search-result-link">
+                <a href={{result.url}}>{{result.title}}</a></br>
+            </h3>
+            <div>
+                <span class="search-result-url">{{result.url}}</span>
+                <br />
+                <span class="search-result-description">{{result.description}}</span>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    <table class="next-page-links">
         <tr>
             <td class="two">
                 <div>2</div>
             </td>
             {% for start in next_page_starts %}
             <td>
-                <a>
-                    <div>0</div>
-                    <a href="/search?q=cubs&start={{start}}">{{ (start / 10) + 1 }}</a>
+                <a class="next-page-link" href="/search?q=cubs&start={{start}}">
+                    <div class="zero">0</div>
+                    <div class="page-number">{{ (start / 10) + 1 }}</div>
                 </a>
             </td>
             {% endfor %}
@@ -41,6 +46,8 @@
             </td>
         </tr>
     </table>
+    <div style="height:200px;">
+    </div>
 </body>
 
 </html>
