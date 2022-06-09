@@ -12,9 +12,7 @@ impl<'a> Deref for SearchResults<'a> {
 
     fn deref(&self) -> &Self::Target {
         &self.results
-    }
-}
-
+    } }
 impl<'a> SearchResults<'a> {
     pub fn new(dom: &'a Html) -> Self {
         SearchResults {

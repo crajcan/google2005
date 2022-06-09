@@ -48,8 +48,7 @@ fn walk<'a>(e: &NodeRef<'a, Node>, search_results: &mut Vec<SearchResult<'a>>) {
                     }
 
                     //add to description
-                    search_results.last_mut().unwrap().add_to_description(description);
-                }
+                    search_results.last_mut().unwrap().add_to_description(description); }
             } else if element.name() == "script" {
                 return
             } else {

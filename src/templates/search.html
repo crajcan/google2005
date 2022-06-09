@@ -7,12 +7,12 @@
 </head>
 
 <body>
-    <h1>
-
-    </h1>
     <h3>
         Showing {{results.len()}} results for "{{query}}".
     </h3>
+    <h4>
+        start: {{start}}
+    </h4>
     {% for result in results %}
     <p>
         <em><b>{{loop.index}}. </b></em>
@@ -22,6 +22,24 @@
         <span>{{result.description}}</span>
     </p>
     {% endfor %}
+    <table>
+        <tr>
+            <td style="vertical-align:top">
+                <div>2</div>
+            </td>
+            {% for start in next_page_starts %}
+            <td>
+                <a>
+                    <div>0</div>
+                    <a href="/search?q=cubs&start={{start}}">{{ (start / 10) + 1 }}</a>
+                </a>
+            </td>
+            {% endfor %}
+            <td style="vertical-align:top">
+                <div>5</div>
+            </td>
+        </tr>
+    </table>
 </body>
 
 </html>

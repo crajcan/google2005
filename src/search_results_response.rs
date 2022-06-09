@@ -2,7 +2,10 @@ use askama::Template;
 use serde::Serialize;
 use urlencoding::decode;
 
-use crate::{search_results::SearchResults, utils::google2005_error::Google2005Error};
+use crate::{
+    search_request::SearchRequest, search_results::SearchResults,
+    utils::google2005_error::Google2005Error,
+};
 
 #[derive(Debug, Serialize)]
 struct DecodedResult {
@@ -16,12 +19,14 @@ struct DecodedResult {
 pub struct SearchResultsResponse {
     results: Vec<DecodedResult>,
     query: String,
+    start: u16,
+    next_page_starts: Vec<u16>,
 }
 
 impl SearchResultsResponse {
     pub fn new(
         parsed: &SearchResults,
-        query: &str,
+        query: SearchRequest,
     ) -> Result<SearchResultsResponse, Google2005Error> {
         let mut results: Vec<DecodedResult> = vec![];
 
@@ -40,9 +45,77 @@ impl SearchResultsResponse {
             });
         }
 
+        let response_start = Self::response_start(query.start);
+        println!("repsonse_start: {}", response_start);
+        let next_page_starts = Self::next_page_starts(response_start);
+        println!("next_page_starts: {:?}", next_page_starts);
+
         Ok(SearchResultsResponse {
             results: results,
-            query: query.to_string(),
+            query: query.search_string,
+            start: response_start,
+            next_page_starts: next_page_starts,
         })
+    }
+
+    fn response_start(requested_start: u16) -> u16 {
+        match requested_start / 10 {
+            0 => 0,
+            x => x * 10,
+        }
+    }
+
+    fn next_page_starts(start: u16) -> Vec<u16> {
+        if start < 60 {
+            (0..10_u16).map(|x| x * 10).collect::<Vec<u16>>()
+        } else {
+            let mut starts = vec![];
+
+            let first = start - 60;
+
+            for i in 1..=10 {
+                starts.push(first + i * 10);
+            }
+
+            starts
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_next_page_starts() {
+        let start = 0;
+        assert_eq!(
+            SearchResultsResponse::next_page_starts(start),
+            vec![0, 10, 20, 30, 40, 50, 60, 70, 80, 90],
+        );
+
+        let start = 40;
+        assert_eq!(
+            SearchResultsResponse::next_page_starts(start),
+            vec![0, 10, 20, 30, 40, 50, 60, 70, 80, 90],
+        );
+
+        let start = 50;
+        assert_eq!(
+            SearchResultsResponse::next_page_starts(start),
+            vec![0, 10, 20, 30, 40, 50, 60, 70, 80, 90],
+        );
+
+        let start = 60;
+        assert_eq!(
+            SearchResultsResponse::next_page_starts(start),
+            vec![10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+        );
+
+        let start = 100;
+        assert_eq!(
+            SearchResultsResponse::next_page_starts(start),
+            vec![50, 60, 70, 80, 90, 100, 110, 120, 130, 140],
+        );
     }
 }

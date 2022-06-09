@@ -2,11 +2,13 @@ use reqwest::Client;
 use scraper::Html;
 
 mod parser;
+mod search_request;
 mod search_result;
 mod search_results;
 mod search_results_response;
 mod utils;
 
+use search_request::SearchRequest;
 use search_results::SearchResults;
 use search_results_response::SearchResultsResponse;
 pub use utils::google2005_error::Google2005Error;
@@ -16,12 +18,15 @@ pub use utils::google2005_error::Google2005Error;
 
 #[allow(unused_variables)]
 pub async fn google(query: &str) -> Result<SearchResultsResponse, Google2005Error> {
+    println!("in lib, query: {}", query);
+
     let response_body = request_search_from_google(query).await?;
     // let response_body = fs::read_to_string("test_seeds/cubs2.html").unwrap();
 
     // write to file
     // let mut file = fs::File::create("george_clooney.html").unwrap();
     // file.write_all(response_body.as_bytes()).unwrap();
+    let request = SearchRequest::new(query);
 
     let dom = Html::parse_document(&response_body);
 
@@ -29,7 +34,7 @@ pub async fn google(query: &str) -> Result<SearchResultsResponse, Google2005Erro
 
     let search_results = hyperlinks.filter();
 
-    let response = SearchResultsResponse::new(&search_results, query)?;
+    let response = SearchResultsResponse::new(&search_results, request)?;
 
     Ok(response)
 }
