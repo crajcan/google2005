@@ -1,3 +1,5 @@
+use chunked_transfer::Encoder;
+
 mod utils;
 use utils::response::Response;
 
@@ -5,7 +7,10 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 
 use std::fs;
+use std::fs::File;
 use std::io::BufRead;
+use std::io::Read;
+use std::io::Write;
 
 extern crate google2005;
 
@@ -33,15 +38,61 @@ async fn handle_connection(mut stream: TcpStream) {
         println!("fetching css");
         let css = fs::read_to_string("src/client/stylesheets/search.css").unwrap();
 
-        render_css(css)
+        render_css(&css)
+    } else if uri(&buffer).ends_with("png") {
+        let path = match uri(&buffer).split("/").last().unwrap() {
+            "two.png" => "src/client/images/two.png",
+            "zero.png" => "src/client/images/zero.png",
+            "redzero.png" => "src/client/images/redzero.png",
+            "five.png" => "src/client/images/five.png",
+            _ => /*404 this */ {
+                "src/client/images/two.png"
+            }
+        };
+
+        render_image(path)
     } else {
-        Response::new(&buffer).await.render()
+        Response::new(&buffer).await.render().as_bytes().to_vec()
     };
 
-    stream.write(response.as_bytes()).await.unwrap();
+    stream.write(&response).await.unwrap();
     stream.flush().await.unwrap();
 
     println!("\n---------------------------------------------------------------\n\n");
+}
+
+pub fn render_css(contents: &str) -> Vec<u8> {
+    format!(
+        "{}\r\nContent-Length: {}\r\n\r\n{}",
+        "HTTP/1.1 200 OK".to_string(),
+        contents.len(),
+        contents
+    )
+    .as_bytes()
+    .to_vec()
+}
+
+fn render_image(path: &str) -> Vec<u8> {
+    let mut buf = Vec::new();
+    let mut file = File::open(&path).unwrap();
+    file.read_to_end(&mut buf).unwrap();
+
+    let mut encoded = Vec::new();
+    {
+        let mut encoder = Encoder::with_chunks_size(&mut encoded, 8);
+        encoder.write_all(&buf).unwrap();
+    }
+
+    let headers = [
+        "HTTP/1.1 200 OK",
+        "Content-type: image/jpeg",
+        "Transfer-Encoding: chunked",
+        "\r\n",
+    ];
+    let mut response = headers.join("\r\n").to_string().into_bytes();
+    response.extend(encoded);
+
+    response
 }
 
 fn first_line(buffer: &[u8]) -> String {
@@ -63,13 +114,4 @@ fn uri(buffer: &[u8]) -> String {
         Some(_s) => parts.next().unwrap_or("").to_string(),
         None => "".to_string(),
     }
-}
-
-pub fn render_css(contents: String) -> String {
-    format!(
-        "{}\r\nContent-Length: {}\r\n\r\n{}",
-        "HTTP/1.1 200 OK".to_string(),
-        contents.len(),
-        contents
-    )
 }

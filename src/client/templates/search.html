@@ -8,51 +8,59 @@
 </head>
 
 <body>
-    <h3>
-        Showing {{results.len()}} results for "{{query}}".
-    </h3>
-    <h4>
-        start: {{response_start}}
-    </h4>
-    <ul class="search-results-list">
-        {% for result in results %}
-        <li class="search-result">
-            <h3 class="search-result-link">
-                <a href={{result.url}}>{{result.title}}</a></br>
-            </h3>
-            <div>
-                <span class="search-result-url">{{result.url}}</span>
-                <br />
-                <span class="search-result-description">{{result.description}}</span>
-            </div>
-        </li>
-        {% endfor %}
-    </ul>
-    <table class="next-page-links">
-        <tr>
-            <td class="two">
-                <div>2</div>
-            </td>
-            {% for start in next_page_starts %}
-            <td>
-                <a class="next-page-link " href="/search?q={{query}}&start={{start}}">
-                    {% let red -%}
-                    {% if response_start == start * 1 -%}
-                    {% let red = "red" -%}
-                    {% else -%}
-                    {% let red = "" -%}
-                    {% endif -%}
-                    <div class="zero {{red}}">0</div>
-                    <div class="page-number">{{ (start / 10) + 1 }}</div>
-                </a>
-            </td>
+    <div class="main">
+        <form class="search-form" method="GET" action="/search">
+            <input type="text" name="q" placeholder="{{query}}">
+            <input type="submit" value="Google2005">
+        </form>
+        <div class="search-info">
+            <span class="query-definition">
+                Searched the web for
+                <b>
+                    <a href="https://www.dictionary.com/browse/{{query}}">{{query}}</a>
+                </b>
+            </span>
+            <span class="results-range">
+                Showing results {{first_result}}-{{last_result-1}}
+            </span>
+        </div>
+        <ul class="search-results-list">
+            {% for result in results %}
+            <li class="search-result">
+                <h3 class="search-result-link">
+                    <a href={{result.url}}>{{result.title}}</a></br>
+                </h3>
+                <div>
+                    <span class="search-result-description">{{result.description}}</span>
+                    <br />
+                    <span class="search-result-url">{{result.url}}</span>
+                </div>
+            </li>
             {% endfor %}
-            <td class="five">
-                <div>5</div>
-            </td>
-        </tr>
-    </table>
-    <div style="height:200px;">
+        </ul>
+        <table class="next-page-links">
+            <tr>
+                <td class="two">
+                    <img src="two.png">
+                </td>
+                {% for start in next_page_starts %}
+                <td>
+                    <a class="next-page-link " href="/search?q={{query}}&start={{start}}">
+                        {% if first_result == start * 1 -%}
+                        <img src="redzero.png">
+                        {% else -%}
+                        <img src="zero.png">
+                        {% endif -%}
+                        <div class="page-number">{{ (start / 10) + 1 }}</div>
+                    </a>
+                </td>
+                {% endfor %}
+                <td class="five">
+                    <img src="five.png">
+                </td>
+            </tr>
+        </table>
+        <div style="height:200px;"></div>
     </div>
 </body>
 

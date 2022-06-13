@@ -19,8 +19,9 @@ struct DecodedResult {
 pub struct SearchResultsResponse {
     results: Vec<DecodedResult>,
     query: String,
-    response_start: u16,
+    first_result: u16,
     next_page_starts: Vec<u16>,
+    last_result: u16,
 }
 
 impl SearchResultsResponse {
@@ -48,14 +49,15 @@ impl SearchResultsResponse {
         Ok(SearchResultsResponse {
             results: results,
             query: query.search_string,
-            response_start: Self::response_start(query.start),
+            first_result: Self::response_start(query.start),
+            last_result: Self::response_start(query.start) + parsed.results.len() as u16,
             next_page_starts: Self::next_page_starts(query.start),
         })
     }
 
     fn response_start(requested_start: u16) -> u16 {
         match requested_start / 10 {
-            0 => 0,
+            0 => 1,
             x => x * 10,
         }
     }

@@ -1,3 +1,5 @@
+use urlencoding::decode;
+
 pub struct SearchRequest<'a> {
     pub params: &'a str,
     pub search_string: String,
@@ -16,6 +18,7 @@ impl<'a> SearchRequest<'a> {
     pub fn search_string(params_string: &'a str) -> String {
         let q = params_string.split("&").collect::<Vec<&str>>()[0];
 
+        let q = decode(q).unwrap();
         //replace + with space
         let q = q.replace("+", " ");
 
