@@ -39,24 +39,24 @@
             {% endfor %}
         </ul>
         <table class="next-page-links">
-            <tr>
+            <tr class="links-row">
                 <td class="two">
-                    <img src="two.png">
+                    <img src="two.png" height="28px" width="20px">
                 </td>
                 {% for start in next_page_starts %}
-                <td>
+                <td class="page-link-container">
                     <a class="next-page-link " href="/search?q={{query}}&start={{start}}">
                         {% if first_result == start * 1 -%}
-                        <img src="redzero.png">
+                        <img src="redzero.png" height="21px" width="21px">
                         {% else -%}
-                        <img src="zero.png">
+                        <img src="zero.png" height="21px" width="21px">
                         {% endif -%}
                         <div class="page-number">{{ (start / 10) + 1 }}</div>
                     </a>
                 </td>
                 {% endfor %}
                 <td class="five">
-                    <img src="five.png">
+                    <img src="five.png" height="28px" width="18px">
                 </td>
             </tr>
         </table>

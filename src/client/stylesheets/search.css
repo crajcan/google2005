@@ -76,6 +76,8 @@ body {
 
 .next-page-link .page-number {
     text-decoration: underline;
+    text-align: center;
+    font-size: 14px;
 }
 
 td.five,
@@ -83,9 +85,15 @@ td.two {
     vertical-align: top;
 }
 
+td.page-link-container {
+    padding: 0;
+}
+
 .two {
     color: #3b5ff9;
     font: 30px garamond;
+    padding-bottom: 25px;
+    padding-top: 4px;
 }
 
 .zero {
@@ -106,6 +114,7 @@ div.zero {
 .five {
     color: green;
     font: 24px garamond;
+    padding-top: 3px;
 }
 
 media screen and (max-width: 768px) {
