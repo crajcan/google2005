@@ -45,9 +45,8 @@ async fn handle_connection(mut stream: TcpStream) {
             "zero.png" => "src/client/images/zero.png",
             "redzero.png" => "src/client/images/redzero.png",
             "five.png" => "src/client/images/five.png",
-            _ => /*404 this */ {
-                "src/client/images/two.png"
-            }
+            "logo.png" => "src/client/images/logo.png",
+            _ => "src/client/images/two.png",
         };
 
         render_image(path)
@@ -79,7 +78,7 @@ fn render_image(path: &str) -> Vec<u8> {
 
     let mut encoded = Vec::new();
     {
-        let mut encoder = Encoder::with_chunks_size(&mut encoded, 8);
+        let mut encoder = Encoder::with_chunks_size(&mut encoded, 32);
         encoder.write_all(&buf).unwrap();
     }
 
@@ -89,6 +88,7 @@ fn render_image(path: &str) -> Vec<u8> {
         "Transfer-Encoding: chunked",
         "\r\n",
     ];
+
     let mut response = headers.join("\r\n").to_string().into_bytes();
     response.extend(encoded);
 

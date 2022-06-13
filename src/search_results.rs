@@ -28,7 +28,7 @@ impl<'a> SearchResults<'a> {
         if self.len() != 10 {
             println!("Error: Should return 10 links, {} links found", self.len());
 
-            println!("{:#?}", self.results);
+            // println!("{:#?}", self.results);
         }
 
         self
