@@ -42,8 +42,8 @@ async fn handle_connection(mut stream: TcpStream) {
     } else if uri(&buffer).ends_with("png") {
         let path = match uri(&buffer).split("/").last().unwrap() {
             "two.png" => "src/client/images/two.png",
-            "zero.png" => "src/client/images/zero.png",
-            "redzero.png" => "src/client/images/redzero.png",
+            "betteryellowzero.png" => "src/client/images/betteryellowzero.png",
+            "betterredzero.png" => "src/client/images/betterredzero.png",
             "five.png" => "src/client/images/five.png",
             "logo.png" => "src/client/images/logo.png",
             _ => "src/client/images/two.png",
