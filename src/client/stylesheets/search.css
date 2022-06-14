@@ -2,12 +2,12 @@ body {
     font: 16px arial, san-serif;
 }
 
-.main {
-    padding-left: 40px;
+.search-section {
+    display: flex;
 }
 
 .search-form {
-    margin-bottom: 20px;
+    padding: 14px 0 0 8px;
 }
 
 .search-info {
@@ -21,7 +21,6 @@ body {
 
 .search-info span {
     line-height: 22px;
-    /* padding-left: 10px; */
 }
 
 .query-definition a {
@@ -115,6 +114,11 @@ div.zero {
     color: green;
     font: 24px garamond;
     padding-top: 3px;
+}
+
+
+media screen and (max-width: 768px) {
+    .logo {}
 }
 
 media screen and (max-width: 768px) {

@@ -9,11 +9,13 @@
 
 <body>
     <div class="main">
-        <img src="logo.png">
-        <form class="search-form" method="GET" action="/search">
-            <input type="text" name="q" placeholder="{{query}}">
-            <input type="submit" value="Google2005">
-        </form>
+        <div class="search-section">
+            <img src="logo.png" class="logo" height="50px" width="120px">
+            <form class="search-form" method="GET" action="/search">
+                <input type="text" name="q" placeholder="{{query}}">
+                <input type="submit" value="Google2005">
+            </form>
+        </div>
         <div class="search-info">
             <span class="query-definition">
                 Searched the web for
@@ -22,7 +24,7 @@
                 </b>
             </span>
             <span class="results-range">
-                Showing results {{first_result}}-{{last_result-1}}
+                page {{page}}, {{(last_result-1)-first_result}} results
             </span>
         </div>
         <ul class="search-results-list">
@@ -47,7 +49,7 @@
                 {% for start in next_page_starts %}
                 <td class="page-link-container">
                     <a class="next-page-link " href="/search?q={{query}}&start={{start}}">
-                        {% if first_result == start * 1 -%}
+                        {% if page_start == start * 1 -%}
                         <img src="redzero.png" height="21px" width="21px">
                         {% else -%}
                         <img src="zero.png" height="21px" width="21px">

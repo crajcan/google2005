@@ -22,6 +22,8 @@ pub struct SearchResultsResponse {
     first_result: u16,
     next_page_starts: Vec<u16>,
     last_result: u16,
+    page_start: u16,
+    page: u16,
 }
 
 impl SearchResultsResponse {
@@ -52,12 +54,21 @@ impl SearchResultsResponse {
             first_result: Self::response_start(query.start),
             last_result: Self::response_start(query.start) + parsed.results.len() as u16,
             next_page_starts: Self::next_page_starts(query.start),
+            page: Self::page(query.start),
+            page_start: Self::page_start(query.start),
         })
     }
 
     fn response_start(requested_start: u16) -> u16 {
         match requested_start / 10 {
             0 => 1,
+            x => x * 10,
+        }
+    }
+
+    fn page_start(requested_start: u16) -> u16 {
+        match requested_start / 10 {
+            0 => 0,
             x => x * 10,
         }
     }
@@ -77,11 +88,51 @@ impl SearchResultsResponse {
             starts
         }
     }
+
+    fn page(start: u16) -> u16 {
+        (start / 10) + 1
+    }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn test_page_handles_zero() {
+        let start = 0;
+        assert_eq!(SearchResultsResponse::page(start), 1);
+    }
+
+    #[test]
+    fn test_page_handles_one() {
+        let start = 1;
+        assert_eq!(SearchResultsResponse::page(start), 1);
+    }
+
+    #[test]
+    fn test_page_handles_ten() {
+        let start = 10;
+        assert_eq!(SearchResultsResponse::page(start), 2);
+    }
+
+    #[test]
+    fn test_page_handles_eleven() {
+        let start = 11;
+        assert_eq!(SearchResultsResponse::page(start), 2);
+    }
+
+    #[test]
+    fn test_page_handles_twenty() {
+        let start = 20;
+        assert_eq!(SearchResultsResponse::page(start), 3);
+    }
+
+    #[test]
+    fn test_page_handles_twenty_one() {
+        let start = 21;
+        assert_eq!(SearchResultsResponse::page(start), 3);
+    }
 
     #[test]
     fn test_next_page_starts() {
