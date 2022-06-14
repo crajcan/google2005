@@ -12,7 +12,7 @@
         <div class="search-section">
             <img src="logo.png" class="logo" height="50px" width="120px">
             <form class="search-form" method="GET" action="/search">
-                <input type="text" name="q" placeholder="{{query}}">
+                <input type="text" name="q" value="{{query}}">
                 <input type="submit" value="Google2005">
             </form>
         </div>
@@ -24,7 +24,7 @@
                 </b>
             </span>
             <span class="results-range">
-                page {{page}}, {{(last_result-1)-first_result}} results
+                Page {{page}}, {{(last_result-1)-first_result}} results
             </span>
         </div>
         <ul class="search-results-list">
