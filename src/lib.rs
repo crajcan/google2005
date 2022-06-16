@@ -1,3 +1,4 @@
+use fastly::http::header::USER_AGENT;
 // use http::{Request, Response};
 use fastly::http::{header, Method, StatusCode};
 use fastly::{mime, Error, Request, Response};
@@ -24,6 +25,7 @@ pub fn google(query: &str) -> Result<SearchResultsResponse, Google2005Error> {
     println!("in lib, query: {}", query);
 
     let response_body = request_search_from_google(query)?;
+    println!("got a response body of length: {}", response_body.len());
     // let response_body = fs::read_to_string("test_seeds/cubs2.html").unwrap();
 
     // write to file
@@ -41,16 +43,23 @@ pub fn google(query: &str) -> Result<SearchResultsResponse, Google2005Error> {
     Ok(response)
 }
 
+const USER_AGENT_STRING: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36";
+
 #[allow(dead_code)]
 fn request_search_from_google(query: &str) -> Result<String, Google2005Error> {
     let url = format!("https://www.google.com/search?q={}", query);
-    let mut resp = Request::get(url).send("example backend")?;
 
-    let body_payload = vec![];
-    resp.get_body_mut().write_bytes(&body_payload);
+    let request = Request::get(url)
+        .with_header("Host", "www.google.com")
+        .with_header("User-Agent", USER_AGENT_STRING)
+        .with_header("Accept", "*/*");
+
+    let mut resp = request.send("google")?;
+
+    let body = resp.take_body().into_string();
 
     match resp.get_status() {
-        StatusCode::OK => Ok(String::from_utf8(body_payload)?),
+        StatusCode::OK => Ok(body),
         _ => Err(Google2005Error::new(
             None,
             Some("Error requesting search from google"),

@@ -13,37 +13,52 @@ fn main(req: Request) -> Result<Response, Error> {
         }
     };
 
-    let query = req.get_path();
-
-    match query {
-        "/search?q=" => Ok(Response::from_status(StatusCode::OK)
+    if req.get_path() == "/search" {
+        println!("            Got correct path");
+        println!("            Got bad path");
+        Ok(Response::from_status(StatusCode::OK)
             .with_content_type(mime::TEXT_HTML_UTF_8)
-            .with_body(Google2005Response::new(&query.as_bytes()).render())),
-        // .as_bytes().to_vec()
-        _ => Ok(Response::from_status(StatusCode::NOT_FOUND)
-            .with_body_text_plain("The page you requested could not be found\n")),
+            .with_body(Google2005Response::new(req.get_query_str()).render()))
+    } else {
+        println!("            Got bad path");
+        Ok(
+            Response::from_status(StatusCode::NOT_FOUND).with_body_text_plain(&format!(
+                r#"The requested page: "{}", could not be found\n"#,
+                req.get_url_str()
+            )),
+        )
     }
 }
 
 use askama::Template;
 
-const SEARCH_URI: &'static str = "GET /search?q=";
-
+const SEARCH_URI: &'static str = "q=";
 pub struct Google2005Response {
     contents: String,
     status_line: String,
 }
 
 impl Google2005Response {
-    pub fn new(buffer: &[u8]) -> Google2005Response {
-        if !buffer.starts_with(SEARCH_URI.as_bytes()) {
+    pub fn new(query: Option<&str>) -> Google2005Response {
+        if query == None {
+            return Google2005Response {
+                contents: String::from(""),
+                status_line: format!("HTTP/1.1 404 RequiredField"),
+            };
+        }
+
+        let query = query.unwrap();
+
+        if !query.starts_with(SEARCH_URI) {
             return Google2005Response {
                 contents: "".to_string(),
                 status_line: format!("HTTP/1.1 404 Not Found"),
             };
         }
 
-        match Self::html_search_response(&Google2005Request::query(&buffer)) {
+        let query = query.trim_start_matches(SEARCH_URI);
+
+        match Self::html_search_response(query) {
             Ok(contents) => Google2005Response {
                 contents,
                 status_line: "HTTP/1.1 200 OK".to_string(),
@@ -71,14 +86,15 @@ impl Google2005Response {
     }
 }
 
-struct Google2005Request;
+// struct Google2005Request;
 
-impl Google2005Request {
-    pub fn query(buffer: &[u8]) -> String {
-        let after_equals = &buffer[14..];
-        let until_space = after_equals.split(|c| *c == b' ').next().unwrap();
-        let string_query = String::from_utf8_lossy(until_space);
+// impl Google2005Request {
+//     pub fn query(query: &str) -> String {
+//         let bytes = query.as_bytes();
+//         let after_equals = &bytes[14..];
+//         let until_space = after_equals.split(|c| *c == b' ').next().unwrap();
+//         let string_query = String::from_utf8_lossy(until_space);
 
-        string_query.to_string()
-    }
-}
+//         string_query.to_string()
+//     }
+// }

@@ -2,7 +2,7 @@
 name = "google2005"
 version = "0.1.0"
 edition = "2021"
-default-run = "fastly"
+default-run = "google2005"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 # [[bin]]
@@ -10,7 +10,7 @@ default-run = "fastly"
 # path = "src/bin/main.rs"
 
 [[bin]]
-name = "fastly"
+name = "google2005"
 path = "src/main.rs"
 
 [dependencies]

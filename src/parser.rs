@@ -29,7 +29,12 @@ fn walk<'a>(e: &NodeRef<'a, Node>, search_results: &mut Vec<SearchResult<'a>>) {
         Node::Element(element) => {
             if element.name() == "a" {
                 //create a search result for the elem and try to add a title
-                let url = element.attr("href").unwrap();
+
+                let url = match element.attr("href") {
+                    Some(path) => path,
+                    None => ""
+                };
+
                 let title = copy_from_headings(e);
 
                 let mut search_result = SearchResult::new(url);
