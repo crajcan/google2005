@@ -1,6 +1,7 @@
 use askama;
 use serde::Serialize;
 use std::fmt::Display;
+use std::string::FromUtf8Error;
 
 #[derive(Debug, Serialize)]
 pub struct Google2005Error {
@@ -42,8 +43,14 @@ impl From<askama::Error> for Google2005Error {
     }
 }
 
-impl From<reqwest::Error> for Google2005Error {
-    fn from(e: reqwest::Error) -> Google2005Error {
+impl From<fastly::http::request::SendError> for Google2005Error {
+    fn from(e: fastly::http::request::SendError) -> Google2005Error {
+        Google2005Error::new(None, Some(&e.to_string()))
+    }
+}
+
+impl From<FromUtf8Error> for Google2005Error {
+    fn from(e: FromUtf8Error) -> Google2005Error {
         Google2005Error::new(None, Some(&e.to_string()))
     }
 }
