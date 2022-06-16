@@ -1,3 +1,6 @@
-target/
+/target
+**/*.rs.bk
+/bin
+/pkg
+*/.DS_Store
 .DS_Store
-
