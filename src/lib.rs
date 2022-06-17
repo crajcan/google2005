@@ -54,9 +54,15 @@ fn request_search_from_google(query: &str) -> Result<String, Google2005Error> {
         .with_header("User-Agent", USER_AGENT_STRING)
         .with_header("Accept", "*/*");
 
+    println!("request: {:#?}", request);
+
+    println!("about to send a request");
     let mut resp = request.send("google")?;
+    // println!("got the response: {:#?}", resp);
 
     let body = resp.take_body().into_string();
+    println!("************** HTTP status: {:?}", resp.get_status());
+    // println!("************** got the body too: {:?}", body);
 
     match resp.get_status() {
         StatusCode::OK => Ok(body),
