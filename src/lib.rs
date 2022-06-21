@@ -62,13 +62,7 @@ fn request_search_from_google(query: &str) -> Result<String, Google2005Error> {
         .with_header("Host", "gwc19qn2w3.execute-api.us-east-2.amazonaws.com")
         .with_body(request_body(url));
 
-    println!("******** request ********: {:#?}", request);
-    // request.set_body(request_body(url));
-
-    println!("******** request ********: {:#?}", request);
-
     let mut resp = request.send("google")?;
-    println!("******** response *******: {:#?}", resp);
 
     let body = resp.take_body().into_string();
     println!("************** HTTP status: {:?}", resp.get_status());

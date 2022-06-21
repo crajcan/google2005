@@ -14,13 +14,17 @@ fn main(req: Request) -> Result<Response, Error> {
     };
 
     if req.get_path() == "/search" {
-        println!("            Got correct path");
-        println!("            Got bad path");
-        Ok(Response::from_status(StatusCode::OK)
-            .with_content_type(mime::TEXT_HTML_UTF_8)
-            .with_body(Google2005Response::new(req.get_query_str()).render()))
+        match Google2005Response::new(req.get_query_str())
+            .contents()
+            .as_str()
+        {
+            "" => Ok(Response::from_status(StatusCode::UNPROCESSABLE_ENTITY)
+                .with_body_text_plain("Please enter a query.")),
+            resp => Ok(Response::from_status(StatusCode::OK)
+                .with_content_type(mime::TEXT_HTML_UTF_8)
+                .with_body(resp)),
+        }
     } else {
-        println!("            Got bad path");
         Ok(
             Response::from_status(StatusCode::NOT_FOUND).with_body_text_plain(&format!(
                 r#"The requested page: "{}", could not be found\n"#,
@@ -35,7 +39,6 @@ use askama::Template;
 const SEARCH_URI: &'static str = "q=";
 pub struct Google2005Response {
     contents: String,
-    status_line: String,
 }
 
 impl Google2005Response {
@@ -43,7 +46,6 @@ impl Google2005Response {
         if query == None {
             return Google2005Response {
                 contents: String::from(""),
-                status_line: format!("HTTP/1.1 404 RequiredField"),
             };
         }
 
@@ -52,20 +54,15 @@ impl Google2005Response {
         if !query.starts_with(SEARCH_URI) {
             return Google2005Response {
                 contents: "".to_string(),
-                status_line: format!("HTTP/1.1 404 Not Found"),
             };
         }
 
         let query = query.trim_start_matches(SEARCH_URI);
 
         match Self::html_search_response(query) {
-            Ok(contents) => Google2005Response {
-                contents,
-                status_line: "HTTP/1.1 200 OK".to_string(),
-            },
+            Ok(contents) => Google2005Response { contents },
             Err(e) => Google2005Response {
                 contents: format!("{}", e),
-                status_line: format!("HTTP/1.1 {} {}", e.status_code, e.status),
             },
         }
     }
@@ -76,13 +73,8 @@ impl Google2005Response {
         Ok(search_results.render()?)
     }
 
-    pub fn render(&self) -> String {
-        format!(
-            "{}\r\nContent-Length: {}\r\n\r\n{}",
-            self.status_line,
-            self.contents.len(),
-            self.contents
-        )
+    fn contents(self) -> String {
+        self.contents
     }
 }
 
