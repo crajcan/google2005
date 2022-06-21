@@ -4,13 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Google2005</title>
-    <link rel="stylesheet" type="text/css" href="search.css">
+    <link rel="stylesheet" type="text/css" href="{{stylesheet_hostname}}search.css">
 </head>
 
 <body>
     <div class="main">
         <div class="search-section">
-            <img src="logo.png" class="logo" height="50px" width="120px">
+            <img src="{{image_hostname}}logo.png" class="logo" height="50px" width="120px">
             <form class="search-form" method="GET" action="/search">
                 <input type="text" name="q" value="{{query}}">
                 <input type="submit" value="Google2005">
@@ -44,22 +44,22 @@
         <table class="next-page-links">
             <tr class="links-row">
                 <td class="two">
-                    <img src="two.png" height="28px" width="20px">
+                    <img src="{{image_hostname}}two.png" height="28px" width="20px">
                 </td>
                 {% for start in next_page_starts %}
                 <td class="page-link-container">
                     <a class="next-page-link " href="/search?q={{query}}&start={{start}}">
                         {% if page_start == start * 1 -%}
-                        <img src="betterredzero.png" height="21px" width="21px">
+                        <img src="{{image_hostname}}betterredzero.png" height="21px" width="21px">
                         {% else -%}
-                        <img src="betteryellowzero.png" height="21px" width="21px">
+                        <img src="{{image_hostname}}betteryellowzero.png" height="21px" width="21px">
                         {% endif -%}
                         <div class="page-number">{{ (start / 10) + 1 }}</div>
                     </a>
                 </td>
                 {% endfor %}
                 <td class="five">
-                    <img src="five.png" height="28px" width="18px">
+                    <img src="{{image_hostname}}five.png" height="28px" width="18px">
                 </td>
             </tr>
         </table>

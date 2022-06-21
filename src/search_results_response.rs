@@ -24,6 +24,8 @@ pub struct SearchResultsResponse {
     last_result: u16,
     page_start: u16,
     page: u16,
+    image_hostname: String,
+    stylesheet_hostname: String,
 }
 
 impl SearchResultsResponse {
@@ -52,10 +54,12 @@ impl SearchResultsResponse {
             results: results,
             query: query.search_string,
             first_result: Self::response_start(query.start),
-            last_result: Self::response_start(query.start) + parsed.results.len() as u16,
             next_page_starts: Self::next_page_starts(query.start),
-            page: Self::page(query.start),
+            last_result: Self::response_start(query.start) + parsed.results.len() as u16,
             page_start: Self::page_start(query.start),
+            page: Self::page(query.start),
+            image_hostname: Self::image_hostname(),
+            stylesheet_hostname: Self::stylesheet_hostname(),
         })
     }
 
@@ -91,6 +95,14 @@ impl SearchResultsResponse {
 
     fn page(start: u16) -> u16 {
         (start / 10) + 1
+    }
+
+    fn image_hostname() -> String {
+        "https://google2005.s3.us-east-2.amazonaws.com/images/".to_string()
+    }
+
+    fn stylesheet_hostname() -> String {
+        "https://google2005.s3.us-east-2.amazonaws.com/stylesheets/".to_string()
     }
 }
 
