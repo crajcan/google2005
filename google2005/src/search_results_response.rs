@@ -3,7 +3,7 @@ use serde::Serialize;
 use urlencoding::decode;
 
 use crate::{
-    search_request::SearchRequest, search_results::SearchResults,
+    search_request::SearchRequest, search_result::SearchResult, search_results::SearchResults,
     utils::google2005_error::Google2005Error,
 };
 
@@ -38,15 +38,12 @@ impl SearchResultsResponse {
         for result in &parsed.results {
             let decoded_url = decode(result.url).unwrap();
             let joined_title = result.title.as_ref().unwrap().join(" ");
-            let joined_description = match result.description.as_ref() {
-                Some(description) => description.join(" "),
-                None => String::from(""),
-            };
+            let description = result.joined_and_decoded_description();
 
             results.push(DecodedResult {
                 url: decoded_url.to_string(),
                 title: joined_title.to_string(),
-                description: joined_description.to_string(),
+                description: description,
             });
         }
 
@@ -62,6 +59,8 @@ impl SearchResultsResponse {
             stylesheet_hostname: Self::stylesheet_hostname(),
         })
     }
+
+
 
     fn response_start(requested_start: u16) -> u16 {
         match requested_start / 10 {

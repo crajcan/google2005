@@ -55,18 +55,23 @@ const GOOGLE2005LAMBDA: &str =
 #[allow(dead_code)]
 fn request_search_from_google(query: &str) -> Result<String, Google2005Error> {
     let url = format!("http://www.google.com/search?q={}", query);
+    let url_copy = url.clone();
 
     let mut request = Request::post(GOOGLE2005LAMBDA)
         .with_header("Content-Type", "application/json")
         .with_header("Accept", "*/*")
         .with_header("Host", "gwc19qn2w3.execute-api.us-east-2.amazonaws.com")
+        .with_header("User-Agent", USER_AGENT_STRING)
         .with_body(request_body(url));
+    println!("request_body: {:#?}", request_body(url_copy).into_string());
 
+    println!("request: {:#?}", request);
     let mut resp = request.send("google")?;
+    println!("response: {:#?}", resp);
 
     let body = resp.take_body().into_string();
-    println!("************** HTTP status: {:?}", resp.get_status());
-    println!("body: {}", body);
+    // println!("************** HTTP status: {:?}", resp.get_status());
+    // println!("body: {}", body);
 
     match resp.get_status() {
         StatusCode::OK => Ok(body),

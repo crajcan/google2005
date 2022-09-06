@@ -1,5 +1,6 @@
 use fastly::http::{header, Method, StatusCode};
 use fastly::{mime, Error, Request, Response};
+extern crate google2005;
 
 #[fastly::main]
 fn main(req: Request) -> Result<Response, Error> {
@@ -61,9 +62,15 @@ impl Google2005Response {
 
         match Self::html_search_response(query) {
             Ok(contents) => Google2005Response { contents },
-            Err(e) => Google2005Response {
-                contents: format!("{}", e),
-            },
+            Err(e) => {
+                println!(
+                    "returning error to front end: \n\n{}\n\nthat's the error",
+                    e
+                );
+                Google2005Response {
+                    contents: format!("{}", e),
+                }
+            }
         }
     }
 
