@@ -2,5 +2,6 @@
 **/*.rs.bk
 /bin
 /pkg
+**/pkg
 */.DS_Store
 .DS_Store
