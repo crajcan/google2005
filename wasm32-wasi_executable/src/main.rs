@@ -81,7 +81,7 @@ impl Google2005Response {
     }
 
     fn html_search_response(query: &str) -> Result<String, google2005::Google2005Error> {
-        let search_results = google2005::google(query, request_search_from_google)?;
+        let search_results = google2005::scrape(query, &request_search_from_google(query)?)?;
 
         Ok(search_results.render()?)
     }
@@ -102,7 +102,6 @@ impl Google2005Response {
 //         string_query.to_string()
 //     }
 // }
-
 
 const USER_AGENT_STRING: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36";
 const GOOGLE2005LAMBDA: &str =

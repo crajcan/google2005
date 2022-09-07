@@ -52,12 +52,6 @@ impl From<fastly::http::request::SendError> for Google2005Error {
     }
 }
 
-impl From<reqwest::Error> for Google2005Error {
-    fn from(e: reqwest::Error) -> Google2005Error {
-        Google2005Error::new(None, Some(&e.to_string()))
-    }
-}
-
 impl From<FromUtf8Error> for Google2005Error {
     fn from(e: FromUtf8Error) -> Google2005Error {
         Google2005Error::new(None, Some(&e.to_string()))

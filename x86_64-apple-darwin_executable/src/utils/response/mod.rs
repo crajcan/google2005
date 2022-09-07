@@ -42,8 +42,8 @@ impl Response {
     async fn request_search_from_google(query: &str) -> Result<String, Google2005Error> {
         let client = Client::new();
         let url = format!("https://www.google.com/search?q={}", query);
-        let res = client.get(&url).send().await?;
-        let body = res.text().await?;
+        let res = client.get(&url).send().await.unwrap();
+        let body = res.text().await.unwrap();
         Ok(body)
     }
 
