@@ -3,7 +3,7 @@ use serde::Serialize;
 use urlencoding::decode;
 
 use crate::{
-    search_request::SearchRequest, search_result::SearchResult, search_results::SearchResults,
+    search_request::SearchRequest, search_results::SearchResults,
     utils::google2005_error::Google2005Error,
 };
 

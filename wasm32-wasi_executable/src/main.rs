@@ -3,11 +3,6 @@ use fastly::{mime, Body, Error, Request, Response};
 extern crate google2005;
 use google2005::Google2005Error;
 
-use std::intrinsics::write_bytes;
-
-use fastly::http::header::USER_AGENT;
-// use http::{Request, Response};
-
 #[fastly::main]
 fn main(req: Request) -> Result<Response, Error> {
     match req.get_method() {
@@ -113,7 +108,7 @@ pub fn request_search_from_google(query: &str) -> Result<String, Google2005Error
     let url = format!("http://www.google.com/search?q={}", query);
     let url_copy = url.clone();
 
-    let mut request = Request::post(GOOGLE2005LAMBDA)
+    let request = Request::post(GOOGLE2005LAMBDA)
         .with_header("Content-Type", "application/json")
         .with_header("Accept", "*/*")
         .with_header("Host", "gwc19qn2w3.execute-api.us-east-2.amazonaws.com")
