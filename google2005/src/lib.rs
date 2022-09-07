@@ -18,18 +18,20 @@ use crate::utils::google2005_error;
 // use std::io::Write;
 
 #[allow(unused_variables)]
-pub fn google(query: &str, request_search_from_google: impl Fn(&str) -> Result<String, Google2005Error>) -> Result<SearchResultsResponse, Google2005Error> {
+pub fn scrape(
+    query: &str,
+    results_page: &str,
+) -> Result<SearchResultsResponse, Google2005Error> {
     println!("in lib, query: {}", query);
 
-    let response_body = request_search_from_google(query)?;
-    println!("got a response body of length: {}", response_body.len());
+    println!("got a response body of length: {}", results_page.len());
     // let response_body = fs::read_to_string("test_seeds/cubs2.html").unwrap();
 
     // write to file
     // let mut file = fs::File::create("george_clooney.html").unwrap();
     // file.write_all(response_body.as_bytes()).unwrap();
     let request = SearchRequest::new(query);
-    let dom = Html::parse_document(&response_body);
+    let dom = Html::parse_document(&results_page);
 
     let mut hyperlinks = SearchResults::new(&dom);
 
@@ -39,4 +41,3 @@ pub fn google(query: &str, request_search_from_google: impl Fn(&str) -> Result<S
 
     Ok(response)
 }
-
