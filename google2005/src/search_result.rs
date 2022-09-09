@@ -98,6 +98,9 @@ impl<'a> SearchResult<'a> {
         let res = decode(&joined_description).unwrap().to_string();
         println!("this rectified result: {:#?}\n", res);
 
+        //convert nbsps
+        let res = res.replace(r#"\u{a0}"#, " ");
+
         res
     }
 }
@@ -153,6 +156,40 @@ mod tests {
         assert_eq!(
             result.description.unwrap(),
             vec!["Cordless Drills", "Miter Saws", "Screw Drivers"]
+        )
+    }
+
+    #[test]
+    fn text_joined_joined_and_decoded_description() {
+        // input from local server
+        // let input = Some(vec![
+        //     "The cat (Felis catus) is referred to as\u{a0}...",
+        //     "List of cat breeds",
+        //     " · ",
+        //     "Cat anatomy",
+        // ]);
+
+        // input from returned by fastly logging
+        let input = Some(vec![
+            "The cat (Felis catus) is referred to as\\u{a0}...",
+            "List of cat breeds",
+            " · ",
+            "Cat anatomy.",
+        ]);
+
+        let input_result = SearchResult {
+            url: "foo",
+            title: Some(vec!["foo"]),
+            description: input,
+        };
+
+        // result on local server
+        let expected =
+            r#"The cat (Felis catus) is referred to as<> ... List of cat breeds  ·  Cat anatomy."#;
+
+        assert_eq!(
+            SearchResult::joined_and_decoded_description(&input_result),
+            expected
         )
     }
 }
