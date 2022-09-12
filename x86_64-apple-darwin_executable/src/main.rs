@@ -11,9 +11,12 @@ use std::io::BufRead;
 use std::io::Read;
 use std::io::Write;
 
-use crate::utils::response::Response;
+use askama::Template;
+
+use crate::utils::response::Response as SearchResponse;
 
 extern crate google2005;
+use google2005::home_page_response::HomePageResponse;
 
 #[tokio::main]
 async fn main() {
@@ -39,7 +42,7 @@ async fn handle_connection(mut stream: TcpStream) {
         println!("fetching css");
         let css = fs::read_to_string("src/client/stylesheets/search.css").unwrap();
 
-        render_css(&css)
+        render_static(&css)
     } else if uri(&buffer).ends_with("png") {
         let path = match uri(&buffer).split("/").last().unwrap() {
             "two.png" => "src/client/images/two.png",
@@ -51,8 +54,15 @@ async fn handle_connection(mut stream: TcpStream) {
         };
 
         render_image(path)
+    } else if uri(&buffer) == "/" {
+        let homepage = HomePageResponse {}.render().unwrap();
+        render_static(&homepage)
     } else {
-        Response::new(&buffer).await.render().as_bytes().to_vec()
+        SearchResponse::new(&buffer)
+            .await
+            .render()
+            .as_bytes()
+            .to_vec()
     };
 
     stream.write(&response).await.unwrap();
@@ -61,7 +71,7 @@ async fn handle_connection(mut stream: TcpStream) {
     println!("\n---------------------------------------------------------------\n\n");
 }
 
-pub fn render_css(contents: &str) -> Vec<u8> {
+pub fn render_static(contents: &str) -> Vec<u8> {
     format!(
         "{}\r\nContent-Length: {}\r\n\r\n{}",
         "HTTP/1.1 200 OK".to_string(),
