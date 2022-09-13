@@ -1,3 +1,9 @@
+# Google2005
+
+A serverless function to scrape, filter and re-render google search
+
+[The running product](https://sensibly-stunning-blowfish.edgecompute.app/search?q=foobar)
+
 ### Build wasm binary for Fastly Compute
 
 ```
