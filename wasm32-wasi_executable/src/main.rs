@@ -130,7 +130,7 @@ const GOOGLE2005LAMBDA: &str =
 pub fn request_search_from_google(
     query: &str,
 ) -> Result<String, Google2005Error> {
-    let url = format!("http://www.google.com/search?q={}", query);
+    let url = format!("https://www.google.com/search?q={}", query);
     let url_copy = url.clone();
 
     let request = Request::post(GOOGLE2005LAMBDA)
