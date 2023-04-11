@@ -15,7 +15,10 @@ use search_results_response::SearchResultsResponse;
 pub use utils::google2005_error::Google2005Error;
 
 #[allow(unused_variables)]
-pub fn scrape(query: &str, results_page: &str) -> Result<SearchResultsResponse, Google2005Error> {
+pub fn scrape(
+    query: &str,
+    results_page: &str,
+) -> Result<SearchResultsResponse, Google2005Error> {
     println!("in lib, query: {}", query);
 
     println!("got a response body of length: {}", results_page.len());

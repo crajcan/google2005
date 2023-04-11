@@ -1,13 +1,13 @@
 use fastly::http::{header, Method, StatusCode};
 use fastly::{mime, Body, Error, Request, Response};
 extern crate google2005;
+use google2005::home_page_response::HomePageResponse;
 use google2005::Google2005Error;
 
 #[fastly::main]
 fn main(req: Request) -> Result<Response, Error> {
     match req.get_method() {
         &Method::GET | &Method::HEAD => (),
-
         _ => {
             return Ok(Response::from_status(StatusCode::METHOD_NOT_ALLOWED)
                 .with_header(header::ALLOW, "GET, HEAD")
@@ -15,7 +15,13 @@ fn main(req: Request) -> Result<Response, Error> {
         }
     };
 
-    if req.get_path() == "/search" {
+    if req.get_path() == "/" {
+        let homepage = HomePageResponse::new().render().unwrap();
+
+        Ok(Response::from_status(StatusCode::OK)
+            .with_content_type(mime::TEXT_HTML_UTF_8)
+            .with_body(homepage))
+    } else if req.get_path() == "/search" {
         match Google2005Response::new(req.get_query_str())
             .contents()
             .as_str()
@@ -28,12 +34,26 @@ fn main(req: Request) -> Result<Response, Error> {
         }
     } else {
         Ok(
-            Response::from_status(StatusCode::NOT_FOUND).with_body_text_plain(&format!(
-                r#"The requested page: "{}", could not be found\n"#,
-                req.get_url_str()
-            )),
+            Response::from_status(StatusCode::NOT_FOUND).with_body_text_plain(
+                &format!(
+                    r#"The requested page: "{}", with path: {}, could not be found\n"#,
+                    req.get_url_str(),
+                    req.get_path()
+                ),
+            ),
         )
     }
+}
+
+pub fn render_static(contents: &str) -> Vec<u8> {
+    format!(
+        "{}\r\nContent-Length: {}\r\n\r\n{}",
+        "HTTP/1.1 200 OK".to_string(),
+        contents.len(),
+        contents
+    )
+    .as_bytes()
+    .to_vec()
 }
 
 use askama::Template;
@@ -75,8 +95,11 @@ impl Google2005Response {
         }
     }
 
-    fn html_search_response(query: &str) -> Result<String, google2005::Google2005Error> {
-        let search_results = google2005::scrape(query, &request_search_from_google(query)?)?;
+    fn html_search_response(
+        query: &str,
+    ) -> Result<String, google2005::Google2005Error> {
+        let search_results =
+            google2005::scrape(query, &request_search_from_google(query)?)?;
 
         Ok(search_results.render()?)
     }
@@ -104,7 +127,9 @@ const GOOGLE2005LAMBDA: &str =
 
 // Try to clone version 21 of the google(lambda) backend and implement TLS
 #[allow(dead_code)]
-pub fn request_search_from_google(query: &str) -> Result<String, Google2005Error> {
+pub fn request_search_from_google(
+    query: &str,
+) -> Result<String, Google2005Error> {
     let url = format!("http://www.google.com/search?q={}", query);
     let url_copy = url.clone();
 

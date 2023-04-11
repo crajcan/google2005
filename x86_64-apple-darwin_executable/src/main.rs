@@ -40,7 +40,7 @@ async fn handle_connection(mut stream: TcpStream) {
 
     let response = if uri(&buffer).ends_with("css") {
         println!("fetching css");
-        let css = fs::read_to_string("src/client/stylesheets/search.css").unwrap();
+        let css = fs::read_to_string("../google2005/src/client/stylesheets/search.css").unwrap();
 
         render_static(&css)
     } else if uri(&buffer).ends_with("png") {
@@ -55,7 +55,7 @@ async fn handle_connection(mut stream: TcpStream) {
 
         render_image(path)
     } else if uri(&buffer) == "/" {
-        let homepage = HomePageResponse {}.render().unwrap();
+        let homepage = HomePageResponse::new().render().unwrap();
         render_static(&homepage)
     } else {
         SearchResponse::new(&buffer)

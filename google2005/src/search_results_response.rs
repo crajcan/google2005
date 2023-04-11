@@ -60,8 +60,6 @@ impl SearchResultsResponse {
         })
     }
 
-
-
     fn response_start(requested_start: u16) -> u16 {
         match requested_start / 10 {
             0 => 1,
