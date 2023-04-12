@@ -19,9 +19,6 @@ pub fn scrape(
     query: &str,
     results_page: &str,
 ) -> Result<SearchResultsResponse, Google2005Error> {
-    println!("in lib, query: {}", query);
-
-    println!("got a response body of length: {}", results_page.len());
     // let response_body = fs::read_to_string("test_seeds/cubs2.html").unwrap();
 
     // write to file

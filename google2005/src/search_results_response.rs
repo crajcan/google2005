@@ -36,7 +36,9 @@ impl SearchResultsResponse {
         let mut results: Vec<DecodedResult> = vec![];
 
         for result in &parsed.results {
+            println!("*** result.url: {}", result.url);
             let decoded_url = decode(result.url).unwrap();
+            println!("** decoded_url: {}", decoded_url);
             let joined_title = result.title.as_ref().unwrap().join(" ");
             let description = result.joined_and_decoded_description();
 
@@ -52,7 +54,8 @@ impl SearchResultsResponse {
             query: query.search_string,
             first_result: Self::response_start(query.start),
             next_page_starts: Self::next_page_starts(query.start),
-            last_result: Self::response_start(query.start) + parsed.results.len() as u16,
+            last_result: Self::response_start(query.start)
+                + parsed.results.len() as u16,
             page_start: Self::page_start(query.start),
             page: Self::page(query.start),
             image_hostname: Self::image_hostname(),

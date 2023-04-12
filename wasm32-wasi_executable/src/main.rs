@@ -98,8 +98,12 @@ impl Google2005Response {
     fn html_search_response(
         query: &str,
     ) -> Result<String, google2005::Google2005Error> {
-        let search_results =
-            google2005::scrape(query, &request_search_from_google(query)?)?;
+        println!("******* requesting search from google *******");
+        let results_page = request_search_from_google(query)?;
+
+        println!("******* about to scrape search results *******");
+        let search_results = google2005::scrape(query, &results_page)?;
+        println!("******* Scraped search results *******");
 
         Ok(search_results.render()?)
     }
@@ -143,12 +147,14 @@ pub fn request_search_from_google(
 
     println!("request: {:#?}", request);
     let mut resp = request.send("google")?;
+    println!("****** received response *****");
     println!("response: {:#?}", resp);
 
     let body = resp.take_body().into_string();
     // println!("************** HTTP status: {:?}", resp.get_status());
     // println!("body: {}", body);
 
+    println!("****** matching on response status *****");
     match resp.get_status() {
         StatusCode::OK => Ok(body),
         _ => Err(Google2005Error::new(

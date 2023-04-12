@@ -36,7 +36,6 @@ fn walk<'a>(e: &NodeRef<'a, Node>, search_results: &mut Vec<SearchResult<'a>>) {
                 };
 
                 let title = copy_from_headings(e);
-
                 let mut search_result = SearchResult::new(url);
                 search_result.title = Some(title);
 

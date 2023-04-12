@@ -3,6 +3,7 @@ use crate::search_result::SearchResult;
 use scraper::Html;
 use std::ops::Deref;
 
+#[derive(Debug)]
 pub struct SearchResults<'a> {
     pub results: Vec<SearchResult<'a>>,
 }
@@ -12,7 +13,9 @@ impl<'a> Deref for SearchResults<'a> {
 
     fn deref(&self) -> &Self::Target {
         &self.results
-    } }
+    }
+}
+
 impl<'a> SearchResults<'a> {
     pub fn new(dom: &'a Html) -> Self {
         SearchResults {
@@ -22,11 +25,15 @@ impl<'a> SearchResults<'a> {
 
     pub fn filter(&mut self) -> &mut Self {
         self.remove_junk();
+        self.strip_quotes();
         self.strip_analytics_bs();
         self.remove_redundant_pages();
 
         if self.len() != 10 {
-            println!("Error: Should return 10 links, {} links found", self.len());
+            println!(
+                "Error: Should return 10 links, {} links found",
+                self.len()
+            );
 
             // println!("{:#?}", self.results);
         }
@@ -39,9 +46,38 @@ impl<'a> SearchResults<'a> {
             .retain(|search_result| search_result.is_regular_result());
     }
 
+    // TODO restore this and move it out of filter
     fn strip_analytics_bs(&mut self) {
         for result in self.results.iter_mut() {
-            result.url = between("url?q=", "&sa=U", result.url)
+            println!("my url:            \"https://www.foobar2000.org/\"");
+            println!("first, result.url: {}", result.url);
+            // result.url = between("url?q=", "&sa=U", result.url);
+            println!("second, result.url: {}", result.url);
+        }
+    }
+
+    // TODO delete this when google2005lambda is solved
+    fn strip_quotes(&mut self) {
+        for result in self.results.iter_mut() {
+            if result.url.len() > 0 && result.url.as_bytes()[0] == 92 {
+                result.url = &result.url[1..];
+            }
+
+            if result.url.len() > 0
+                && result.url.as_bytes()[result.url.len() - 1] == 34
+            {
+                result.url = &result.url[..result.url.len() - 1];
+            }
+
+            if result.url.len() > 0 && result.url.as_bytes()[0] == 34 {
+                result.url = &result.url[1..];
+            }
+
+            if result.url.len() > 0
+                && result.url.as_bytes()[result.url.len() - 1] == 92
+            {
+                result.url = &result.url[..result.url.len() - 1];
+            }
         }
     }
 
@@ -77,6 +113,19 @@ fn bookended_with(start: &str, end: &str, s: &str) -> String {
 #[cfg(test)]
 mod test {
     use super::*;
+    #[test]
+    fn test_remove_quotes() {
+        let url = r#"\"https://www.wikipedia.org/\""#;
+        let result = SearchResult::new(url);
+        let mut results = SearchResults {
+            results: vec![result],
+        };
+
+        let expected = r#"https://www.wikipedia.org/"#;
+        results.strip_quotes();
+
+        assert_eq!(results[0].url, expected);
+    }
 
     #[test]
     fn test_between() {

@@ -10,6 +10,8 @@ pub struct SearchResult<'a> {
 
 impl<'a> SearchResult<'a> {
     pub fn new(url: &'a str) -> Self {
+        println!("building search result url: {:#?}", url);
+
         SearchResult {
             url,
             title: None,
@@ -88,15 +90,12 @@ impl<'a> SearchResult<'a> {
     }
 
     pub fn joined_and_decoded_description(&self) -> String {
-        println!("this search result description: {:#?}", self.description);
-
         let joined_description = match self.description.as_ref() {
             Some(description) => description.join(" "),
             None => String::from(""),
         };
 
         let res = decode(&joined_description).unwrap().to_string();
-        println!("this rectified result: {:#?}\n", res);
 
         //convert nbsps
         let res = res.replace(r#"\u{a0}"#, " ");
