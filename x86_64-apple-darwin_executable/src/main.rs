@@ -20,7 +20,9 @@ use google2005::home_page_response::HomePageResponse;
 
 #[tokio::main]
 async fn main() {
-    let listener: tokio::net::TcpListener = TcpListener::bind("127.0.0.1:7878").await.unwrap();
+    let listener: tokio::net::TcpListener =
+        TcpListener::bind("127.0.0.1:7878").await.unwrap();
+    println!("listening on port 7878");
 
     loop {
         let (stream, _) = listener.accept().await.unwrap();
@@ -40,7 +42,10 @@ async fn handle_connection(mut stream: TcpStream) {
 
     let response = if uri(&buffer).ends_with("css") {
         println!("fetching css");
-        let css = fs::read_to_string("../google2005/src/client/stylesheets/search.css").unwrap();
+        let css = fs::read_to_string(
+            "../google2005/src/client/stylesheets/search.css",
+        )
+        .unwrap();
 
         render_static(&css)
     } else if uri(&buffer).ends_with("png") {
@@ -68,7 +73,9 @@ async fn handle_connection(mut stream: TcpStream) {
     stream.write(&response).await.unwrap();
     stream.flush().await.unwrap();
 
-    println!("\n---------------------------------------------------------------\n\n");
+    println!(
+        "\n---------------------------------------------------------------\n\n"
+    );
 }
 
 pub fn render_static(contents: &str) -> Vec<u8> {

@@ -63,7 +63,7 @@ fn walk<'a>(e: &NodeRef<'a, Node>, search_results: &mut Vec<SearchResult<'a>>) {
         }
         Node::Text(description) => {
             //add a decription to the last search result if there is none
-            if search_results.len() != 0
+            if search_results.len() != 0 && description.starts_with("http")
             {
                 search_results.last_mut().unwrap().add_to_description(vec![&(**description)]);
             }

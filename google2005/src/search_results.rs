@@ -34,8 +34,6 @@ impl<'a> SearchResults<'a> {
                 "Error: Should return 10 links, {} links found",
                 self.len()
             );
-
-            // println!("{:#?}", self.results);
         }
 
         self
@@ -49,10 +47,7 @@ impl<'a> SearchResults<'a> {
     // TODO restore this and move it out of filter
     fn strip_analytics_bs(&mut self) {
         for result in self.results.iter_mut() {
-            println!("my url:            \"https://www.foobar2000.org/\"");
-            println!("first, result.url: {}", result.url);
             // result.url = between("url?q=", "&sa=U", result.url);
-            println!("second, result.url: {}", result.url);
         }
     }
 

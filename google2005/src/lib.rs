@@ -12,6 +12,7 @@ pub use home_page_response::HomePageResponse;
 use search_request::SearchRequest;
 use search_results::SearchResults;
 use search_results_response::SearchResultsResponse;
+// use std::fs;
 pub use utils::google2005_error::Google2005Error;
 
 #[allow(unused_variables)]
@@ -19,7 +20,8 @@ pub fn scrape(
     query: &str,
     results_page: &str,
 ) -> Result<SearchResultsResponse, Google2005Error> {
-    // let response_body = fs::read_to_string("test_seeds/cubs2.html").unwrap();
+    // let results_page =
+    // fs::read_to_string("/Users/carsonrajcan/source/rust/google2005/google2005/test_seeds/kafft_results.html").unwrap();
 
     // write to file
     // let mut file = fs::File::create("george_clooney.html").unwrap();

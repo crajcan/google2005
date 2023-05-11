@@ -36,9 +36,9 @@ impl SearchResultsResponse {
         let mut results: Vec<DecodedResult> = vec![];
 
         for result in &parsed.results {
-            println!("*** result.url: {}", result.url);
+            // println!("*** result.url: {}", result.url);
             let decoded_url = decode(result.url).unwrap();
-            println!("** decoded_url: {}", decoded_url);
+            // println!("** decoded_url: {}", decoded_url);
             let joined_title = result.title.as_ref().unwrap().join(" ");
             let description = result.joined_and_decoded_description();
 

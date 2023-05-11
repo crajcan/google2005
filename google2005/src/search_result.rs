@@ -10,7 +10,7 @@ pub struct SearchResult<'a> {
 
 impl<'a> SearchResult<'a> {
     pub fn new(url: &'a str) -> Self {
-        println!("building search result url: {:#?}", url);
+        // println!("building search result url: {:#?}", url);
 
         SearchResult {
             url,
@@ -123,8 +123,9 @@ mod tests {
 
     #[test]
     fn test_web_page_returns_segment_before_pound_sign() {
-        let mut result =
-            SearchResult::new("https://en.wikipedia.org/wiki/David_Blough#2015_season");
+        let mut result = SearchResult::new(
+            "https://en.wikipedia.org/wiki/David_Blough#2015_season",
+        );
         result.title = Some(vec!["David", "Blough"]);
 
         assert_eq!(
@@ -135,8 +136,9 @@ mod tests {
 
     #[test]
     fn test_web_page_returns_segment_before_percent_sign() {
-        let mut result =
-            SearchResult::new("https://en.wikipedia.org/wiki/David_Blough%232015_season");
+        let mut result = SearchResult::new(
+            "https://en.wikipedia.org/wiki/David_Blough%232015_season",
+        );
         result.title = Some(vec!["David", "Blough"]);
 
         assert_eq!(
@@ -183,8 +185,7 @@ mod tests {
         };
 
         // result on local server
-        let expected =
-            r#"The cat (Felis catus) is referred to as<> ... List of cat breeds  ·  Cat anatomy."#;
+        let expected = r#"The cat (Felis catus) is referred to as<> ... List of cat breeds  ·  Cat anatomy."#;
 
         assert_eq!(
             SearchResult::joined_and_decoded_description(&input_result),
