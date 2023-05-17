@@ -35,6 +35,10 @@ impl SearchResultsResponse {
     ) -> Result<SearchResultsResponse, Google2005Error> {
         let mut results: Vec<DecodedResult> = vec![];
 
+        if parsed.results.len() == 0 {
+            return Err(Google2005Error::new(None, Some("No results found")));
+        }
+
         for result in &parsed.results {
             // println!("*** result.url: {}", result.url);
             let decoded_url = decode(result.url).unwrap();

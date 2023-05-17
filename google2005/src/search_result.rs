@@ -10,7 +10,7 @@ pub struct SearchResult<'a> {
 
 impl<'a> SearchResult<'a> {
     pub fn new(url: &'a str) -> Self {
-        // println!("building search result url: {:#?}", url);
+        println!("building search result url: {:#?}", url);
 
         SearchResult {
             url,

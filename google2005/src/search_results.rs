@@ -26,7 +26,7 @@ impl<'a> SearchResults<'a> {
     pub fn filter(&mut self) -> &mut Self {
         self.remove_junk();
         self.strip_quotes();
-        self.strip_analytics_bs();
+        // self.strip_analytics_bs();
         self.remove_redundant_pages();
 
         if self.len() != 10 {
@@ -45,6 +45,7 @@ impl<'a> SearchResults<'a> {
     }
 
     // TODO restore this and move it out of filter
+    #[allow(dead_code)]
     fn strip_analytics_bs(&mut self) {
         for result in self.results.iter_mut() {
             // result.url = between("url?q=", "&sa=U", result.url);
@@ -90,6 +91,7 @@ impl<'a> SearchResults<'a> {
     }
 }
 
+#[allow(dead_code)]
 fn between<'a, 'b>(start: &'a str, end: &'a str, s: &'b str) -> &'b str {
     let start_index = s.find(start).unwrap_or(0);
     let end_index = s.find(end).unwrap_or(s.len());
