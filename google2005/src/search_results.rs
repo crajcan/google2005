@@ -47,9 +47,9 @@ impl<'a> SearchResults<'a> {
     // TODO restore this and move it out of filter
     #[allow(dead_code)]
     fn strip_analytics_bs(&mut self) {
-        for result in self.results.iter_mut() {
+        // for result in self.results.iter_mut() {
             // result.url = between("url?q=", "&sa=U", result.url);
-        }
+        // }
     }
 
     // TODO delete this when google2005lambda is solved

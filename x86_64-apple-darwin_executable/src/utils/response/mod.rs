@@ -1,5 +1,3 @@
-use std::f32::consts::E;
-
 use crate::utils::request;
 use google2005::Google2005Error;
 use reqwest::Client;

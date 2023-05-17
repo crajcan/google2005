@@ -12,7 +12,7 @@ pub use home_page_response::HomePageResponse;
 use search_request::SearchRequest;
 use search_results::SearchResults;
 use search_results_response::SearchResultsResponse;
-use std::{fs, io::Write};
+use std::fs;
 pub use utils::google2005_error::Google2005Error;
 
 #[allow(unused_variables)]
