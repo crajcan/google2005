@@ -53,6 +53,11 @@ impl SearchResultsResponse {
             });
         }
 
+        // turn everything off for now :( 
+        if  results.len() < 2 {
+            return Err(Google2005Error::new(None, Some("No results found")));
+        }
+
         Ok(SearchResultsResponse {
             results: results,
             query: query.search_string,

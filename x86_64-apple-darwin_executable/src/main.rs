@@ -13,7 +13,7 @@ use std::io::Write;
 
 use askama::Template;
 
-use crate::utils::response::Response as SearchResponse;
+use crate::utils::response::Response as Google2005Response;
 
 extern crate google2005;
 use google2005::home_page_response::HomePageResponse;
@@ -63,7 +63,7 @@ async fn handle_connection(mut stream: TcpStream) {
         let homepage = HomePageResponse::new().render().unwrap();
         render_static(&homepage)
     } else {
-        SearchResponse::new(&buffer)
+        Google2005Response::new(&buffer)
             .await
             .render()
             .as_bytes()

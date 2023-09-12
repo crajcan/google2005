@@ -24,9 +24,14 @@ impl<'a> SearchResults<'a> {
     }
 
     pub fn filter(&mut self) -> &mut Self {
+        println!(
+            "******* filtering search results *******:\n {:#?}",
+            self.results
+        );
+
         self.remove_junk();
         self.strip_quotes();
-        // self.strip_analytics_bs();
+        self.strip_analytics_bs();
         self.remove_redundant_pages();
 
         if self.len() != 10 {
@@ -45,11 +50,10 @@ impl<'a> SearchResults<'a> {
     }
 
     // TODO restore this and move it out of filter
-    #[allow(dead_code)]
     fn strip_analytics_bs(&mut self) {
-        // for result in self.results.iter_mut() {
-            // result.url = between("url?q=", "&sa=U", result.url);
-        // }
+        for result in self.results.iter_mut() {
+            result.url = between("url?q=", "&sa=U", result.url);
+        }
     }
 
     // TODO delete this when google2005lambda is solved
@@ -132,6 +136,21 @@ mod test {
             between("url?q=", "&sa=U", input),
             "https://www.sbnation.com/authors/jon-bois"
         )
+    }
+
+    #[test]
+    fn filter_preserves_good_results() {
+        let analytics_link = "http://localhost:7878/url?q=https://www.sbnation.com/authors/jon-bois&sa=U&ved=2ahUKEwj91bWk2IT3AhV1omoFHTGiCBgQFnoECAwQAg&usg=AOvVaw0tLu83JeMGMgnFF9iLD2uA";
+        let shitty_quoted_link = r#"\"https://www.wikipedia.org/\""#;
+
+        let mut input = SearchResults {
+            results: vec![
+                SearchResult::new(analytics_link),
+                SearchResult::new(shitty_quoted_link),
+            ],
+        };
+
+        assert_eq!(input.filter().len(), 2);
     }
 
     #[test]
