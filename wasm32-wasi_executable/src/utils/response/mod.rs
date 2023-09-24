@@ -114,8 +114,6 @@ pub fn request_search_from_google(
     println!("response: {:#?}", resp);
 
     let body = resp.take_body().into_string();
-    // println!("************** HTTP status: {:?}", resp.get_status());
-    // println!("body: {}", body);
 
     println!("****** matching on response status *****");
     match resp.get_status() {

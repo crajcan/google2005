@@ -16,8 +16,8 @@ impl Google2005Error {
         user_error: Option<&str>,
         internal_error: Option<&str>,
     ) -> Google2005Error {
-        println!("creating error, user_error:     \n\n{:?}", user_error);
-        println!("                internal_error: \n\n{:?}", internal_error);
+        println!("creating error, user_error:     \n\n{:?}\n", user_error);
+        println!("                internal_error: \n\n{:?}\n", internal_error);
 
         Google2005Error {
             user_error: user_error.map(|s| s.to_string()),
