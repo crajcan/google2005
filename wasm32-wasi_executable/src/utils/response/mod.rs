@@ -59,7 +59,6 @@ impl Response {
 
         println!("******* about to scrape search results *******");
         let search_results = google2005::scrape(query, &results_page)?;
-        println!("******* Scraped search results *******");
 
         Ok(search_results.render()?)
     }
@@ -98,9 +97,6 @@ pub fn request_search_from_google(
     query: &str,
 ) -> Result<String, Google2005Error> {
     let url = google_url(query);
-    let url_copy = url.clone();
-    println!("my body: {:#?}", request_body(url_copy.clone()).into_string());
-    let body = request_body(url_copy.clone());
 
     let request = FastlyRequest::post(GOOGLE2005LAMBDA)
         .with_header("Content-Type", "application/json")
@@ -108,16 +104,11 @@ pub fn request_search_from_google(
         .with_header("Host", "gwc19qn2w3.execute-api.us-east-2.amazonaws.com")
         .with_header("User-Agent", USER_AGENT_STRING)
         .with_body(request_body(url));
-    println!("request_body: {:#?}", request_body(url_copy).into_string());
 
-    println!("request: {:#?}", request);
     let mut resp = request.send("google")?;
-    println!("****** received response *****");
-    println!("response: {:#?}", resp);
 
     let body = resp.take_body().into_string();
 
-    println!("****** matching on response status *****");
     match resp.get_status() {
         StatusCode::OK => Ok(body),
         _ => Err(Google2005Error::new(

@@ -24,14 +24,10 @@ impl<'a> SearchResults<'a> {
     }
 
     pub fn filter(&mut self) -> &mut Self {
-        println!(
-            "******* filtering search results *******:\n {:#?}",
-            self.results
-        );
-
         self.remove_junk();
         self.strip_quotes();
-        self.strip_analytics_bs();
+        // self.strip_analytics_bs();
+        // println!("************ after_analytics bs: {:#?}", self);
         self.remove_redundant_pages();
 
         if self.len() != 10 {
@@ -50,11 +46,11 @@ impl<'a> SearchResults<'a> {
     }
 
     // TODO restore this and move it out of filter
-    fn strip_analytics_bs(&mut self) {
-        for result in self.results.iter_mut() {
-            result.url = between("url?q=", "&sa=U", result.url);
-        }
-    }
+    // fn strip_analytics_bs(&mut self) {
+    //     for result in self.results.iter_mut() {
+    //         result.url = between("url?q=", "&sa=U", result.url);
+    //     }
+    // }
 
     // TODO delete this when google2005lambda is solved
     fn strip_quotes(&mut self) {

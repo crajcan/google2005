@@ -41,8 +41,7 @@ fn walk<'a>(e: &NodeRef<'a, Node>, search_results: &mut Vec<SearchResult<'a>>) {
 
                 search_results.push(search_result);
             } else if element.name() == "span" {
-                if search_results.len() != 0
-                {
+                if search_results.len() != 0 {
                     let description = all_copy(e);
 
                     if description.contains(&"People also ask") {
@@ -52,7 +51,12 @@ fn walk<'a>(e: &NodeRef<'a, Node>, search_results: &mut Vec<SearchResult<'a>>) {
                     }
 
                     //add to description
-                    search_results.last_mut().unwrap().add_to_description(description); }
+                    search_results.last_mut().unwrap().add_to_description(description);
+                }
+
+                for child in e.children() {
+                    walk(&child, search_results);
+                }
             } else if element.name() == "script" {
                 return
             } else {

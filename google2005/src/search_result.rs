@@ -10,8 +10,6 @@ pub struct SearchResult<'a> {
 
 impl<'a> SearchResult<'a> {
     pub fn new(url: &'a str) -> Self {
-        println!("building search result url: {:#?}", url);
-
         SearchResult {
             url,
             title: None,
@@ -54,7 +52,7 @@ impl<'a> SearchResult<'a> {
     }
 
     fn is_image_link(&self) -> bool {
-        self.url.contains("imgres?imgurl=")
+        self.url.contains("sca_esv")
     }
 
     fn is_google_ad(&self) -> bool {

@@ -48,7 +48,7 @@
                 </td>
                 {% for start in next_page_starts %}
                 <td class="page-link-container">
-                    <a class="next-page-link " href="/search?q={{query}}&start={{start}}">
+                    <a class="next-page-link " href="/search?q={{query}}&start={{start}}&filter=0">
                         {% if page_start == start * 1 -%}
                         <img src="{{image_hostname}}betterredzero.png" height="21px" width="21px">
                         {% else -%}
