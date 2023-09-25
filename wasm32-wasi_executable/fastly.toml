@@ -9,6 +9,6 @@ name = "google2005"
 service_id = "2ye37drIOUCDT6N2qZ9AOL"
 
 [local_server]
-  [local_server.backends]
-    [local_server.backends.google]
-      url = "https://gwc19qn2w3.execute-api.us-east-2.amazonaws.com:443/google2005lambda"
+[local_server.backends]
+[local_server.backends.google]
+url = "https://gwc19qn2w3.execute-api.us-east-2.amazonaws.com:443"

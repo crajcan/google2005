@@ -99,6 +99,8 @@ pub fn request_search_from_google(
 ) -> Result<String, Google2005Error> {
     let url = google_url(query);
     let url_copy = url.clone();
+    println!("my body: {:#?}", request_body(url_copy.clone()).into_string());
+    let body = request_body(url_copy.clone());
 
     let request = FastlyRequest::post(GOOGLE2005LAMBDA)
         .with_header("Content-Type", "application/json")
